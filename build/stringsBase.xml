@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">AnyStopagencyBuildVersion: agencyLongToken</string>
+    
+    <!-- This string should be "true" if we are in testing mode -->
+    <string name="globalTestingMode">true</string>
+    
+    <!-- The Real AnyStop flurry APIK -->
+    <string name="flurryAPIK">1P866LVHUKQSM9VRYX2P</string>
+    <!-- Ivan's testing flurry APIK -->
+    <!-- <string name="flurryAPIK">L1TFARJSSPM7LQLCZL8L</string> -->
+    
+    <!-- Admob APIKs for BusBrothers and BB/Nextbus-shared apprs -->
+    <string name="BBadmobAPIK">a14b02469f7bc59</string>
+    <string name="NBISadmobAPIK">a14b2fc34b5bc1d</string>
+	<string name="BBaddienceAPIK">5ae16ba2850e6197e539148080574a25</string>
+    <!-- Below are APIKs for AdWhirl; these are Ivan's personal APIKs for testing ONLY -->
+    <string name="BBadwhirlAPIK">8732a7ca288f4d40b82dac36385cb4f9</string>
+    <string name="NBISadwhirlAPIK">8732a7ca288f4d40b82dac36385cb4f9</string>
+    <!-- Below added for Advertising Keywords, this defines keywords to make Admob ads more relevant to user -->
+    <string name="admobsdk_keywords">Android transit travel bicycle bus train hipster</string>
+    <string name="adwhirlTimeout">60000</string>
+    
+    <!-- The below is Ivan's personal maps APIK -->
+    <!-- <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string> -->
+    
+    <!-- Below strings are used to set up UI-related things -->
+    <!-- <string name="defaultTypeface">normal</string> -->
+    <string name="defaultTypeface">fonts/bluehighwayregular.otf</string>
+    <!-- <string name="defaultTypeface">fonts/mplus-1c-light.ttf</string> -->
+    
+    <!-- Agency settings -->
+    <string name="agencyName">agencyNameToken</string>
+    <string name="agencyTable">agencyTableToken</string>
+    <string name="agencyPredictionType">agencyRealTimeToken</string>
+    <string name="agencyTag">agencyTagToken</string>
+    <string name="agencyLong">agencyLongToken</string>
+    <string name="agencyShort">agencyShortToken</string>
+	<string name="agencyScheduleTable">agencyScheduleToken</string>
+    <string name="agencyIsHybrid">agencyHybridToken</string>
+    <!-- The below strings are used by ChooseMap to set up the MapView, to point to the right area -->
+    <string name="agencyLat">agencyLatToken</string>
+    <string name="agencyLon">agencyLonToken</string>
+    <string name="agencyZoomLevel">11</string>
+	<!-- The below gets used to set the *minimum* zoom level for startmap -->
+    <string name="agencyStopMapZoomLevel">16</string>
+    
+    <!-- Default UI Strings -->
+    <string name="AgencyRouteList_SubtitleHint">Select a Route</string>
+    <string name="AgencyRouteDrill_SubtitleHint">Select a Stop and Direction</string>
+    <string name="PredictionAutoRefreshPeriod">180</string>
+    
+    <!-- Below added for Searchable Activity -->
+    <string name="search_hint"></string>    
+    
+    <string name="maps_apik">0O7uJsBn99wHmfezC5lcnTtnXp85hU8CaMiCLLg</string>
+	
+	<!-- URL that we will get "dynamic" settings from -->
+    <string name="anyStopSettingsURL">http://feed.busbrothers.org/anyStopSettings.txt</string>
+    
+</resources>

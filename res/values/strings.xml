@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">San Diego Metropolitan Transit System - AnyStop (beta.0201)</string>
+    
+    <!-- This string should be "true" if we are in testing mode -->
+    <string name="globalTestingMode">true</string>
+    
+    <!-- The Real AnyStop flurry APIK -->
+    <!-- <string name="flurryAPIK">1P866LVHUKQSM9VRYX2P</string> -->
+    <!-- Ivan's testing flurry APIK -->
+    <string name="flurryAPIK">L1TFARJSSPM7LQLCZL8L</string>
+    
+    <!-- Admob APIKs for BusBrothers and BB/Nextbus-shared apprs -->
+    <string name="BBadmobAPIK">a14b02469f7bc59</string>
+    <string name="NBISadmobAPIK">a14b2fc34b5bc1d</string>
+    <string name="BBaddienceAPIK">5ae16ba2850e6197e539148080574a25</string>
+    <!-- Below are APIKs for AdWhirl; these are Ivan's personal APIKs for testing ONLY -->
+    <string name="BBadwhirlAPIK">8732a7ca288f4d40b82dac36385cb4f9</string>
+    <string name="NBISadwhirlAPIK">8732a7ca288f4d40b82dac36385cb4f9</string>
+    <!-- Below added for Advertising Keywords, this defines keywords to make Admob ads more relevant to user -->
+    <string name="admobsdk_keywords">Android transit travel bicycle bus train hipster</string>
+    <string name="adwhirlTimeout">60000</string>
+    
+    <!-- The below is Ivan's personal maps APIK -->
+    <!-- <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string> -->
+    
+    <!-- Below strings are used to set up UI-related things -->
+    <!-- <string name="defaultTypeface">normal</string> -->
+    <string name="defaultTypeface">fonts/bluehighwayregular.otf</string>
+    <!-- <string name="defaultTypeface">fonts/mplus-1c-light.ttf</string> -->
+    
+    <!-- Agency settings -->
+    <!-- <string name="agencyName">mts</string>
+    <string name="agencyTable">mts</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">mts</string>
+    <string name="agencyLong">San Diego Metropolitan Transit System</string>
+    <string name="agencyShort">San Diego MTS</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">Rutgers_Univ__Newark_College_Town_Shuttle</string>
+    <string name="agencyTable">Rutgers_Univ__Newark_College_Town_Shuttle</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">rutgers</string>
+    <string name="agencyLong">Rutgers University</string>
+    <string name="agencyShort">Rutgers University</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">Elon_University</string>
+    <string name="agencyTable">Elon_University</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">elonuniversity</string>
+    <string name="agencyLong">Elon University</string>
+    <string name="agencyShort">Elon University</string>-->
+    
+    <!--  <string name="agencyName">badhill</string>
+    <string name="agencyTable">badhill</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">badhill</string>
+    <string name="agencyLong">King County Metro Transit</string>
+    <string name="agencyShort">King County</string> -->
+    
+    <!-- <string name="agencyName">caltrain</string>
+    <string name="agencyTable">caltrain</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">caltrain</string>
+    <string name="agencyLong">Caltrain</string>
+    <string name="agencyShort">Caltrain</string> -->
+    
+    <!-- <string name="agencyName">port_authority_of_allegheny_county</string>
+    <string name="agencyTable">port_authority_of_allegheny_county</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">alleghenycounty</string>
+    <string name="agencyLong">Allegheny County Port Authority</string>
+    <string name="agencyShort">Allegheny Port Authority</string> -->
+    
+    <!-- <string name="agencyName">mta_new_york_city_transit</string>
+    <string name="agencyTable">mta_new_york_city_transit</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">mtanewyorkcity</string>
+    <string name="agencyLong">MTA New York</string>
+    <string name="agencyShort">MTA NY</string> -->
+    
+    <!-- <string name="agencyName">auckland_regional_transport_authority</string>
+    <string name="agencyTable">auckland_regional_transport_authority</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">auckland</string>
+    <string name="agencyLong">Auckland Regional Transit Authority</string>
+    <string name="agencyShort">Auckland Transit</string> -->
+    
+    <!-- <string name="agencyName">Charm_City_Circulator</string>
+    <string name="agencyTable">Charm_City_Circulator</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">charmcity</string>
+    <string name="agencyLong">Charm City Circulator</string>
+    <string name="agencyShort">Charm City</string> -->
+    
+    <!-- <string name="agencyName">MBTA</string>
+    <string name="agencyTable">MBTA</string>
+    <string name="agencyScheduleTable">LBieda</string>
+    <string name="agencyIsHybrid">isAHybridAgency</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">dmorafftransit</string>
+    <string name="agencyLong">Massachusetts Bay Transit Authority</string>
+    <string name="agencyShort">MBTA</string> -->
+    
+    <string name="agencyName">TriMet</string>
+    <string name="agencyTable">TriMet</string>
+    <string name="agencyPredictionType">special</string>
+    <string name="agencyTag">trimet</string>
+    <string name="agencyLong">Portland Trimet</string>
+    <string name="agencyShort">TriMet</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    
+    <!-- The below strings are used by ChooseMap to set up the MapView, to point to the right area -->
+    <string name="agencyLat">32745882</string>
+    <string name="agencyLon">-117090711</string>
+    <string name="agencyZoomLevel">11</string>
+    <!-- The below gets used to set the *minimum* zoom level for startmap -->
+    <string name="agencyStopMapZoomLevel">16</string>
+    
+    <!-- Default UI Strings -->
+    <string name="AgencyRouteList_SubtitleHint">Select a Route</string>
+    <string name="AgencyRouteDrill_SubtitleHint">Select a Stop and Direction</string>
+    <string name="PredictionAutoRefreshPeriod">180</string>
+    
+    <!-- Below added for Searchable Activity -->
+    <string name="search_hint"></string>    
+    
+    <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string>
+    
+    <!-- URL that we will get "dynamic" settings from -->
+    <string name="anyStopSettingsURL">http://feed.busbrothers.org/anyStopSettings.txt</string>
+    
+</resources>

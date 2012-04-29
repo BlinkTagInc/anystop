@@ -1,0 +1,95 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/row_lay"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:gravity="center_vertical"
+	android:orientation="horizontal"
+	android:cacheColorHint="#FFFF"
+>
+	<ImageView
+		android:id="@+id/icon"
+		android:layout_width="wrap_content"
+		android:padding="2dp"
+		android:layout_height="36sp"
+		android:src="@drawable/stop"
+		android:layout_gravity="top"
+		android:cacheColorHint="#FFFF"
+		android:visibility="gone"
+	/>
+	
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/row_textandimagesection"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:orientation="horizontal"
+		android:padding="3dp"
+		android:cacheColorHint="#FFFF"
+		android:gravity="center_vertical"
+	>
+		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/row_textsection"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:orientation="vertical"
+		android:cacheColorHint="#FFFF"
+		android:gravity="center_vertical"
+		android:layout_weight="0.9"
+		>
+			<TextView
+				android:id="@+id/dir_label"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingLeft="12pt"
+				android:textSize="24sp"
+				android:textColor="#F000"
+				android:layout_gravity="center_vertical"
+				android:gravity="center_vertical"
+				android:cacheColorHint="#FFFF"
+				android:text="dir_label"
+			/>
+			<TextView
+				android:id="@+id/dir_sched"
+				android:paddingLeft="16pt"
+				android:layout_width="wrap_content"
+				android:layout_height="20sp"
+				android:textSize="18sp"
+				android:layout_gravity="center_vertical"
+				android:textColor="#FEB0"
+				android:text=""
+				android:cacheColorHint="#FFFF"
+				android:layout_below="@id/dir_label"
+				android:visibility="gone"
+			/>
+			<TextView
+				android:id="@+id/dir_subinfo"
+				android:layout_below="@id/dir_sched"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="#F666"
+				android:textSize="16sp"
+				android:layout_gravity="center_vertical"
+				android:cacheColorHint="#FFFF"
+				android:paddingLeft="10pt"
+			/>
+		</LinearLayout>
+		
+		<org.busbrothers.anystop.agencytoken.uicomponents.IndexCheck
+			android:id="@+id/favbox"
+			android:layout_width="wrap_content"
+			android:paddingTop="44px"
+			android:paddingRight="64px"
+			android:paddingLeft="32px"
+			android:layout_height="wrap_content"
+			android:cacheColorHint="#000"
+			android:gravity="center"
+			android:focusable="false"
+			android:button="@drawable/btn_check_green"
+			android:visibility="gone"
+			android:layout_weight="0"
+		/>
+	</LinearLayout>
+	
+	
+</LinearLayout>

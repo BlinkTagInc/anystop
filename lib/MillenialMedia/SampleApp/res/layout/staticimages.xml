@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:mm="http://millennialmedia.com/android/schema"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	>
+		<GridView
+			android:id="@+id/staticGridView"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1"
+			android:columnWidth="90dp"
+			android:numColumns="auto_fit"
+			android:verticalSpacing="10dp"
+			android:horizontalSpacing="10dp"
+			android:stretchMode="columnWidth"
+			/>
+		<com.millennialmedia.android.MMAdView
+			android:id="@+id/adView"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:minHeight="53dp"
+			
+			mm:apid="28911"
+			mm:adType="MMBannerAdBottom"
+			
+			mm:refreshInterval="30"
+			mm:accelerate="true"
+			mm:age="46"
+			mm:gender="male"
+			mm:zip="94105"
+			mm:income="75000"
+			mm:ethnicity="hispanic"
+			mm:orientation="straight"
+			mm:marital="married"
+			mm:children="2"
+			mm:education="college"
+			mm:politics="libertarian"
+			
+			/>
+</LinearLayout>

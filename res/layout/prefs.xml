@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="preferencescreen">
+   	<PreferenceCategory android:title="Help Text"> 
+   	    <!--  Notes that the default value has to also be set in Manager, where getSharedPreferences() is called. -->
+	    <CheckBoxPreference
+	            android:key="usage_enabled"
+	            android:title="Display Usage Text" 
+	            android:summary="Popup text will tell you about how to use each page!"
+	            android:defaultValue="false"  />
+	    </PreferenceCategory>
+	            
+</PreferenceScreen> 

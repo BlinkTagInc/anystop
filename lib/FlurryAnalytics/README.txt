@@ -1,0 +1,2 @@
+This flurry analytics library was downloaded and added to the project on 2011-11-12 by Ivan Y.
+The version that was previously used, and was being used in production as of 2011-11-12, resides in Anystop/lib.

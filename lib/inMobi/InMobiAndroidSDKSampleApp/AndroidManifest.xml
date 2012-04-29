@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.inmobi.sample" android:versionCode="1"
+	android:versionName="1.0">
+
+	<application android:icon="@drawable/inmobi_app_new" android:label="InMobi Ads">
+		<activity android:name=".InMobiAdActivity" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<!-- Mandatory activity declaration to show the Ad in the embedded browser -->
+		<activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
+			android:configChanges="keyboardHidden|orientation|keyboard" />
+
+	</application>
+
+	<!-- Internet is mandatory permission -->
+	<uses-permission android:name="android.permission.INTERNET" />
+
+	<!-- optional permissions to serve location based Ads -->
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<!-- optional permission to enable the user to make calls from Ads -->
+	<uses-permission android:name="android.permission.CALL_PHONE" />
+	<!-- optional permission to get the network state for targeting purposes -->
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-sdk android:minSdkVersion="4" />
+</manifest>

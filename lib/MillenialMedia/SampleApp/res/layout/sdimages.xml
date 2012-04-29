@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	>
+		<GridView
+			android:id="@+id/sdGridView"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1"
+			android:columnWidth="90dp"
+			android:numColumns="auto_fit"
+			android:verticalSpacing="10dp"
+			android:horizontalSpacing="10dp"
+			android:stretchMode="columnWidth"
+			/>
+		<RelativeLayout android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:padding="10px">
+			<Button
+				android:id="@+id/displayButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:text=" Display " />
+			<Button
+				android:id="@+id/checkButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_toLeftOf="@id/displayButton"
+				android:layout_marginRight="5dp"
+				android:text=" Check " />
+			<Button
+				android:id="@+id/fetchButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_toLeftOf="@id/checkButton"
+				android:layout_marginRight="5dp"
+				android:text=" Fetch " />
+		</RelativeLayout>
+		<FrameLayout
+			android:id="@+id/adFrameLayout"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:minHeight="53dp"
+			/>
+</LinearLayout>

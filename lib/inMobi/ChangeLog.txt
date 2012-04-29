@@ -1,0 +1,1 @@
+Android SDK a300 - Changelog============================16-Sep-2011: SDK a300 (Build 3.0.1) released. - Displaying better descriptive error messages when using logcat.------------------------------------08-Sep-2011: SDK a300 (Build 3.0.0) released.

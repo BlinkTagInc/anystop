@@ -1,0 +1,7 @@
+Get real-time transit information for agencyLongToken in cityToken, stateToken with AnyStop! Uses the GPS on the vehicle if available.
+
+With Google Maps integration, you can find the nearest stops. Be it by bus, train, or ferry, AnyStop will get you there.
+
+Arrival times and predictions are powered by NextBus
+
+Use the GPS positions of vehicles to know exactly when your transit will arrive.

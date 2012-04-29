@@ -1,0 +1,48 @@
+
+-assumenosideeffects class android.util.Log {
+	public static *** d(...);
+	public static *** v(...);
+	public static *** i(...);
+}
+
+-libraryjars /libs/AdWhirlSDK.jar
+-libraryjars /libs/FlurryAgent.jar
+-libraryjars /libs/GoogleAdMobAdsSdk.jar
+
+-dontwarn com.google.**
+-dontwarn com.adwhirl.**
+
+-dontpreverify
+-repackageclasses ''
+-allowaccessmodification
+-optimizations !code/simplification/arithmetic
+-keepattributes *Annotation*
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.view.View {
+    public <init>(android.content.Context);
+    public <init>(android.content.Context, android.util.AttributeSet);
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+    public void set*(...);
+}
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+-keepclassmembers class * implements android.os.Parcelable {
+    static android.os.Parcelable$Creator CREATOR;
+}
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+-keep public class com.sensedk.** {*;}
+-dontwarn com.sensedk.networks.**
+-dontnote com.sensedk.networks.**
+
+-keep public class com.google.** {*;}

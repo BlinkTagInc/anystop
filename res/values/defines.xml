@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="screen_size_large" format="float" type="define">4.5</item>    
+</resources>

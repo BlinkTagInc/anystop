@@ -1,0 +1,110 @@
+Change Log 
+-------------------------------
+
+4.5.0, 10/11/2011
+-------------------------------------
+Fetch, check, and display functions now allow better control over interactive video interstitials and other cached ads
+Interactive video cache sharing among other Millennial Media publishers on the same device
+Application retargeting from within creatives using third party scheme urls (For more information see Millennial Media's Branded App SDK)
+Improved location-based tracking using the new updateUserLocation method
+Added precaching capabilities
+Added click to interactive video support
+Added new overhauled creative javascript bridge for showing more immersive advertising
+Better conversion tracking support for multiple goal ids
+Misc. improvements and bug fixes
+Added a MMAdCachingCompleted(MMAdView adview, boolean success) as a new required listener method
+
+4.2.7, 8/24/2011
+Reverted accidental inclusion of Android SDK level 5 api method.
+Fixed small memory leak.
+
+4.2.6, 7/19/2011
+Improvements to the ad overlays with back button support and better layout
+Better d-pad support
+Fixed a small memory leak
+Fixed a small infrequent problem of ad settings persisting between ads
+MMAdViews now only launch one overlay on many repetitive clicks
+Added a "vendor" ad parameter for mediators
+Disabled back button while interactive videos are playing
+Added support for interactive video on devices without external sd card storage
+
+4.2.5, 5/17/2011
+Repaired an issue with listener events not being called by interactive ads
+Changed the way assets are cached on the SDK so they are no longer visible in the gallery
+Minor bug fixes
+
+4.2.4, 5/4/2011
+Repaired an issue with listener events not being called by interactive videos
+Updated to support new development testing features
+Added .nomedia file for assets stored on the SD card
+
+4.2.3, 4/18/2011
+Minor bug fixes
+Efficiency enhancements
+
+Version 4.2.2, 4/7/2011
+Enhancements to interactive video experience
+Various bug and stability fixes
+Added native browser support for interactive videos
+Added logging levels for basic and advanced troubleshooting
+
+Version 4.2, 3/19/2011
+Enhancements for a richer more robust video caching experience
+Added new setting for banner ads to ignore density scaling
+Various bug and stability fixes
+
+Version 4.1, 3/2/2011
+Added ability to integrate an MMAdView in XML
+Enabled a video caching experience
+Updated UI for ad overlays and videos
+Various bug fixes
+
+Version 3.6.3, 11/26/2010
+Minor bug fixes
+
+Version 3.6.2, 10/12/2010
+Minor bug fixes
+
+Version 3.6.1, 9/22/2010
+Added additional meta data parameters including children, education, politics
+Fixed limitation in gender meta data field
+
+Version 3.6, 9/14/2010
+**** Added new requirement to declare VideoPlayer activity in the AndroidManifest.xml file ****
+Added support for video interstitials
+Added greater support for video, click-to-call, and click-to-market campaigns in the overlay
+Added a lower navigation bar to the web view overlay
+Various bug fixes
+
+Version 3.5.4, 8/6/2010
+Fixed null-pointer error with location APIs
+Added support for ethnicity and sexual orientation meta data
+
+Version 3.5.3, 6/21/2010
+Added support for click to Android market and click to call advertisements
+
+Version 3.5.2, 6/10/2010
+Stability fixes
+
+Version 3.5, 5/14/2010
+Added ability for ads to overlay or use new browser when clicked
+Added accelerometer support
+Added interface, providing callbacks to main application about major ad events
+Added ability to turn off automatic ad calls and call for an ad at will
+Added interstitial support
+Added conversion tracking support
+
+
+Version 2.5.1, 4/20/2010
+Reduced minimum refresh time to 30 seconds
+Fixed bug with detecting screen lock
+
+Version 2.5, 3/19/2010
+Added ability to set refresh timer to any value greater than 60 seconds.
+Added test mode
+Added ability to accept hashtable of meta data
+
+
+Version 2.1, 1/18/2010
+First SDK
+Accepts timer of off or 60 seconds

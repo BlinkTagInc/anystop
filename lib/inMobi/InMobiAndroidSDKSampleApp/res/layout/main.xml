@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical" android:padding="2dip"
+	android:background="@drawable/default_bg">
+	<LinearLayout android:layout_width="fill_parent"
+		android:id="@+id/linearLayoutParent" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_weight="60">
+		<!-- Make sure you provide the valid adSlot and appID attributes for the 
+			IMAdView -->
+		<com.inmobi.androidsdk.IMAdView
+			android:layout_width="320dp" android:layout_height="50dp" android:id="@+id/imAdview"
+			appId="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" adSlot="15" />
+		<Button android:text="Refresh Ad" android:id="@+id/btnRefreshAd"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:padding="5dip" android:onClick="onRefreshAd"
+			android:layout_marginTop="20dip"></Button>
+	</LinearLayout>
+	<LinearLayout android:layout_width="fill_parent"
+		android:id="@+id/linearLayout2" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_weight="30">
+		<TextView android:text="Interstitial Ad: " android:id="@+id/textView1"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+		<Button android:text="Get Interstitial Ad" android:id="@+id/btnGetIntAd"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:onClick="onGetInAd"></Button>
+		<Button android:text="Show Interstitial Ad" android:id="@+id/btnShowIntAd"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:onClick="onShowInAd"></Button>
+
+	</LinearLayout>
+
+
+
+</LinearLayout>
