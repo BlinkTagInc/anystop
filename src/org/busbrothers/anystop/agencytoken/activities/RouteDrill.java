@@ -94,26 +94,7 @@ public class RouteDrill extends CustomList {
 		
 		//The below block of code sets up the AdView for this Activity, and adds it to the Layout
 		setContentView(R.layout.routedrill);
-		LinearLayout adLayoutParent = (LinearLayout) findViewById(R.id.dlist_ad_holder); //this LinearLayout will contain the AdView
 		
-		//The below code sets up Advertisement-related stuff for this activity
-		if(Manager.adTypeUsing() == Manager.ADMOB_AD) {			
-			//The below block of code sets up the AdView for this Activity, and adds it to the Layout
-			AdView googleAdMobAd = Manager.setupAdView(this); //have Manager set up the AdView for us :)
-			adLayoutParent.addView(googleAdMobAd);
-			
-			//Hide (& disable?) the Addience adview
-			AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
-			adView.setVisibility(View.GONE);
-			adView.optOut();
-		}
-		else if(Manager.adTypeUsing() == Manager.ADDIENCE_AD) {
-			//Don't have to disable the Admob adview, since we never create it in the first place
-			AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
-			Manager.setupAddienceAd(this, adView);
-		}
-		
-		adLayoutParent.invalidate();
 		
 		//Determine who we were called by
 		Bundle extras = getIntent().getExtras();
@@ -278,7 +259,33 @@ public class RouteDrill extends CustomList {
 	protected void onResume() {
 		super.onResume();
 		doAutoRefresh=true;
+		
+		LinearLayout adLayoutParent = (LinearLayout) findViewById(R.id.dlist_ad_holder); //this LinearLayout will contain the AdView
+		
+		//The below code sets up Advertisement-related stuff for this activity
+		if(Manager.adTypeUsing() == Manager.ADMOB_AD) {			
+			//The below block of code sets up the AdView for this Activity, and adds it to the Layout
+			AdView googleAdMobAd = Manager.setupAdView(this); //have Manager set up the AdView for us :)
+			adLayoutParent.addView(googleAdMobAd);
+			
+			//Hide (& disable?) the Addience adview
+			//AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
+			//adView.setVisibility(View.GONE);
+			//adView.optOut();
+		}
+		else if(Manager.adTypeUsing() == Manager.ADDIENCE_AD) {
+			//Don't have to disable the Admob adview, since we never create it in the first place
+			
+			//We would use this if we had instantiated an addience ad layout in the XML
+			//AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
+			
+			AswAdLayout adView = Manager.makeAddienceAd(this);
+			adLayoutParent.addView(adView);
+		}
+		
+		adLayoutParent.invalidate();
 	}
+
 	
 	/** We override onPause, only to set doAutoRefresh appropriately */
 	protected void onPause() {

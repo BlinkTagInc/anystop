@@ -46,6 +46,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
 import android.os.Debug; //for printMemoryUsageInfo()
@@ -61,8 +62,10 @@ public class Manager {
 	public static final int ROUTES = 1;
 	public static final int AGENCY = 2;
 	public static final int FAVROUTES = 3;
-	public static final int STOP = 4;
-	public static final int ROUTE = 5;
+	public static final int FAVSTOPS = 4;
+	public static final int STOP = 5;
+	public static final int ROUTE = 6;
+	public static final int CHOOSEMAP = 7;
 	
 	//Kind of like an enum for advertisement types
 	public static final int ADMOB_AD = 0;
@@ -560,6 +563,12 @@ public class Manager {
 		else return b.toString();
 	}
 	
+	/**This method gets a list of stops for a particular route. 
+	 * 
+	 * @param a The Agency that we are performing a query on.
+	 * @param route The name of the route that we should fetch a list of stops for\r.
+	 * @return String representing the XML that desribes the list of stops for route.
+	 */
 	private static String getRouteStopsXML(Agency a, String route) {
 		return(getRouteStopsXML(a, route, false));
 	}
@@ -593,6 +602,9 @@ public class Manager {
     	}
     	System.out.println(rq);
     	Manager.lastRequest = rq;
+    	
+    	Log.v("Manager", "Getting Stop List using URL=" + rq);
+    	
 		try {	
 			URL u = new URL(rq);
 			is = u.openStream();
@@ -621,7 +633,7 @@ public class Manager {
     			"&latitude=" + loc.getLatitude()*10 +
     			"&longitude=" + loc.getLongitude()*10 +
     			"&agency="+Manager.getScheduleTableName() + 
-    			"&agency="+string;
+    			"&agency2="+string;
     	else 
     		rq = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2.jsp?" +
 				"&latitude=" + loc.getLatitude()*10 +
@@ -1262,11 +1274,48 @@ public class Manager {
 		return(returned);
 	}*/
 	
+	private static AswAdLayout currentAddienceAdview;
+	private static long currentAddienceAdviewAge = 0; //time when we last refreshed currentAddienceAdview, in seconds
+	private static final int currentAddienceAdviewAge_threshold = 29; //threshold for currentAddienceAdview "timeout"
+	/** This methods returns, to an Activity, the Addience ad that it should use. The default behavior is 
+	 * that we will create a new ad every 30 seconds. If the old ad has not "timed out" we will reuse it, 
+	 * otherwise we'll create a new addience ad.
+	 */
+	public static AswAdLayout makeAddienceAd(Activity caller) {
+		long current_time_seconds = System.currentTimeMillis()/1000; 
+		if(currentAddienceAdview == null || (current_time_seconds-currentAddienceAdviewAge) > currentAddienceAdviewAge_threshold) {
+			currentAddienceAdview = new AswAdLayout(caller);
+			currentAddienceAdviewAge = current_time_seconds;
+			
+			setupAddienceAd(caller, currentAddienceAdview);
+			
+			Log.v(activityNameTag, "Loaded a new Addience ad!");
+		}
+		else {
+			((ViewGroup)currentAddienceAdview.getParent()).removeView(currentAddienceAdview);
+		}
+		
+		return(currentAddienceAdview);
+	}
+	
 	/** This method performs the necessary setup for Addience ads 
 	 * @param caller The calling Activity.
 	 * @param adview The AswAdLayout that we are setting up. 
 	 */
 	public static void setupAddienceAd(Activity caller, AswAdLayout adview) {
+		
+		//Trying to reproduce the below XML, here, in Java code.
+		/*<com.sensedk.AswAdLayout
+		android:id="@+id/addience_adview"
+		android:layout_height="50dip" (check)
+		android:layout_width="fill_parent" (check)
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:background="#000000" (check)
+		/>*/
+		
+		adview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 50));
+		adview.setBackgroundColor(0x00000000);
 		adview.setActivity(caller);
 	}
 	
@@ -1350,14 +1399,14 @@ public class Manager {
 	 * of processes that share that page.
 	 * 
 	 */
-	public static void printMemoryUsageInfo() {
+	/*public static void printMemoryUsageInfo() {
 		Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
 		Debug.getMemoryInfo(memInfo);
 		
 		//Print out stuff to Log.v() about memory usage
 		Log.v(activityNameTag, "AnyStop app currently has PSS of " + memInfo.getTotalPss() + "kB and total private dirty page set of " 
 				+ memInfo.getTotalPrivateDirty() + "kB.");
-	}
+	}*/
 	
 	/** This method returns the nearest SimpleStop to the current location out of a List of SimpleStops. 
 	* If no current location is set, then null is returned. If the list has no SimpleStops,

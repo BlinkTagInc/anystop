@@ -186,6 +186,7 @@ public class StopsTime extends Activity{
         
     	favStops.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+            	Manager.viewing=Manager.FAVSTOPS;
             	Manager.favstops=new ArrayList<SimpleStop>((HashSet<SimpleStop>)Favorites.getInstance().getFavStops());
             	Intent i = new Intent(v.getContext(), FavStops.class);
             	startActivityForResult(i,0);
@@ -208,6 +209,7 @@ public class StopsTime extends Activity{
     	
     	locate.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+            	Manager.viewing=Manager.CHOOSEMAP;
             	Intent i = new Intent(v.getContext(), ChooseMap.class);
             	startActivityForResult(i,0);
             }
@@ -362,7 +364,7 @@ public class StopsTime extends Activity{
 		}
         
         //Report memory usage
-        Manager.printMemoryUsageInfo();
+        //Manager.printMemoryUsageInfo();
         
         Log.v(activityNameTag, "Starting Flurry session.");
 		FlurryAgent.onStartSession(this, Manager.getFlurryAPIK());

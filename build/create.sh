@@ -120,6 +120,7 @@ fi
 #Set up a guard so that ANT doesn't go around obfuscating the library code
 #echo "Setting up ProGuard guards for library JAR files"
 cd AnyStop
+touch proguard.cfg
 cat proguard.cfg ../libguard.txt > proguard.cfg.new
 rm proguard.cfg
 mv proguard.cfg.new proguard.cfg
@@ -136,7 +137,7 @@ cd bin
 
 #Sign the JAR with our keystore
 echo "Signing and aligning generated APK"
-jarsigner -verbose -keystore ../../busbrothers.keystore -storepass  "NOT_A_VALID_PASSWORD" $UNSIGNED_APK_FILENAME AnyStop
+jarsigner -verbose -sigalg MD5withRSA -digestalg SHA1 -keystore ../../busbrothers.keystore -storepass  "NOT_A_VALID_PASSWORD" $UNSIGNED_APK_FILENAME AnyStop
 #run zipalign to dword-align the noncompressed stuff in the JAR, to optimize memory usage for Android apps or something
 zipalign -v 4 $UNSIGNED_APK_FILENAME $SIGNED_APK_FILENAME
 

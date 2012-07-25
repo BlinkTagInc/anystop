@@ -22,15 +22,40 @@
     <string name="admobsdk_keywords">Android transit travel bicycle bus train hipster</string>
     <string name="adwhirlTimeout">60000</string>
     
-    <!-- The below is Ivan's personal maps APIK -->
-    <!-- <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string> -->
-    
     <!-- Below strings are used to set up UI-related things -->
     <!-- <string name="defaultTypeface">normal</string> -->
     <string name="defaultTypeface">fonts/bluehighwayregular.otf</string>
     <!-- <string name="defaultTypeface">fonts/mplus-1c-light.ttf</string> -->
     
     <!-- Agency settings -->
+    
+    <string name="agencyName">pace-suburban-bus-service</string>
+    <string name="agencyTable">pace_suburban_bus_service</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">pace-suburban-bus-service</string>
+    <string name="agencyLong">Pace Suburban Bus Service</string>
+    <string name="agencyShort">Pace</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    
+    <!--  <string name="agencyName">thebus</string>
+    <string name="agencyTable">thebus</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">thebus</string>
+    <string name="agencyLong">TheBus</string>
+    <string name="agencyShort">Honolulu</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">metropolitan_transit_authority_of_harris_county</string>
+    <string name="agencyTable">metropolitan_transit_authority_of_harris_county</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">harriscounty</string>
+    <string name="agencyLong">Houston METRO</string>
+    <string name="agencyShort">Houston METRO</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
     <!-- <string name="agencyName">mts</string>
     <string name="agencyTable">mts</string>
     <string name="agencyPredictionType">schedule</string>
@@ -107,18 +132,18 @@
     <string name="agencyLong">Massachusetts Bay Transit Authority</string>
     <string name="agencyShort">MBTA</string> -->
     
-    <string name="agencyName">TriMet</string>
+    <!-- <string name="agencyName">TriMet</string>
     <string name="agencyTable">TriMet</string>
     <string name="agencyPredictionType">special</string>
     <string name="agencyTag">trimet</string>
     <string name="agencyLong">Portland Trimet</string>
     <string name="agencyShort">TriMet</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
     <!-- The below strings are used by ChooseMap to set up the MapView, to point to the right area -->
-    <string name="agencyLat">32745882</string>
-    <string name="agencyLon">-117090711</string>
+    <string name="agencyLat">37336000</string>
+    <string name="agencyLon">-121893000</string>
     <string name="agencyZoomLevel">11</string>
     <!-- The below gets used to set the *minimum* zoom level for startmap -->
     <string name="agencyStopMapZoomLevel">16</string>
@@ -131,7 +156,8 @@
     <!-- Below added for Searchable Activity -->
     <string name="search_hint"></string>    
     
-    <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string>
+    <string name="maps_apik">0O7uJsBn99wGNmFPh8ad7bAbG--41TZlm-EDPhA</string>
+    <!-- <string name="maps_apik">0O7uJsBn99wEoZo6P4PFD3dWB_piiOy7dHUtt_Q</string> -->
     
     <!-- URL that we will get "dynamic" settings from -->
     <string name="anyStopSettingsURL">http://feed.busbrothers.org/anyStopSettings.txt</string>

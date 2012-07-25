@@ -3,6 +3,7 @@ package org.busbrothers.anystop.agencytoken.datacomponents;
 import java.io.Serializable;
 
 import org.busbrothers.anystop.agencytoken.Manager;
+import org.json.JSONObject;
 
 import com.google.android.maps.GeoPoint;
 
@@ -31,6 +32,8 @@ public class SimpleStop implements Comparable<SimpleStop>, Serializable {
 			return null;
 		}
 	}
+	
+	
 	
 	/** This function will check whether this SimpleStop object contains the String 'key' in one of it's searched fields. The searched fields
 	 * are:
@@ -63,13 +66,14 @@ public class SimpleStop implements Comparable<SimpleStop>, Serializable {
 
 	
 	/** The compareTo function compares this SimpleStop to another, either by intersection or by routeName. If we are in the ROUTE
-	 * 	view, we compare by intersection (using SmartSort's compare method). Otherwise, we compare by route name.
+	 * 	view, we compare by intersection (using SmartSort's compare method). Otherwise, we compare by routeName.
 	 * @see SmartSort
 	 */
 	public int compareTo(SimpleStop another) {
-		if (Manager.viewing==Manager.ROUTES) {
+		if (Manager.viewing==Manager.ROUTES || Manager.viewing==Manager.FAVSTOPS) {
 			return SmartSort.compare(this.intersection, another.intersection, true);
 		} else {
+			//return SmartSort.compare(this.intersection, another.intersection, true);
 			return SmartSort.compare(this.routeName, another.routeName, true);
 		}
 

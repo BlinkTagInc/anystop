@@ -9,17 +9,7 @@ xmlns:admobsdk="http://schemas.android.com/apk/res/org.busbrothers.anystop.agenc
      
      <LinearLayout android:id="@+id/dlist_ad_holder"
 		android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"
-		android:layout_centerHorizontal="true" android:layout_alignParentBottom="true">
-		
-		<com.sensedk.AswAdLayout
-			android:id="@+id/addience_adview"
-			android:layout_height="50dip"
-			android:layout_width="fill_parent"
-			android:layout_gravity="center"
-			android:gravity="center"
-			android:background="#000000"
-			/>
-		
+		android:layout_centerHorizontal="true" android:layout_alignParentBottom="true">		
 	</LinearLayout>
 
 

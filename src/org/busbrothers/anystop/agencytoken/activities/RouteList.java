@@ -85,26 +85,6 @@ public class RouteList extends CustomList {
 		
 		//The below block of code sets up the AdView for this Activity, and adds it to the Layout
 		setContentView(R.layout.routelist);
-		LinearLayout adLayoutParent = (LinearLayout) findViewById(R.id.dlist_ad_holder); //this LinearLayout will contain the AdView
-		
-		//The below code sets up Advertisement-related stuff for this activity
-		if(Manager.adTypeUsing() == Manager.ADMOB_AD) {			
-			//The below block of code sets up the AdView for this Activity, and adds it to the Layout
-			AdView googleAdMobAd = Manager.setupAdView(this); //have Manager set up the AdView for us :)
-			adLayoutParent.addView(googleAdMobAd);
-			
-			//Hide (& disable?) the Addience adview
-			AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
-			adView.setVisibility(View.GONE);
-			adView.optOut();
-		}
-		else if(Manager.adTypeUsing() == Manager.ADDIENCE_AD) {
-			//Don't have to disable the Admob adview, since we never create it in the first place
-			AswAdLayout adView = (AswAdLayout)findViewById(R.id.addience_adview);
-			Manager.setupAddienceAd(this, adView);
-		}
-		
-		adLayoutParent.invalidate();
 		
 		Log.v(activityNameTag, activityNameTag+" was opened, but not in a search.");
 
@@ -158,6 +138,25 @@ public class RouteList extends CustomList {
 			Manager.flurryActivityOpenEvent(activityNameTag, searchQueryStack.empty());
 			flurryEventLogged = true;
 		}
+	}
+	
+	protected void onResume() {
+		super.onResume();
+		
+		LinearLayout adLayoutParent = (LinearLayout) findViewById(R.id.dlist_ad_holder); //this LinearLayout will contain the AdView
+		
+		//The below code sets up Advertisement-related stuff for this activity
+		if(Manager.adTypeUsing() == Manager.ADMOB_AD) {			
+			//The below block of code sets up the AdView for this Activity, and adds it to the Layout
+			AdView googleAdMobAd = Manager.setupAdView(this); //have Manager set up the AdView for us :)
+			adLayoutParent.addView(googleAdMobAd);
+		}
+		else if(Manager.adTypeUsing() == Manager.ADDIENCE_AD) {
+			AswAdLayout adView = Manager.makeAddienceAd(this);
+			adLayoutParent.addView(adView);
+		}
+		
+		adLayoutParent.invalidate();
 	}
 	
 	/** This method gets called if this activity is at the top of the stack and its launch mode is set to singleTop in the App manifest.
