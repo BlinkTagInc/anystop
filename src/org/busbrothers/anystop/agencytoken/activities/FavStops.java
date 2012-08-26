@@ -282,7 +282,7 @@ public class FavStops extends CustomList {
 				row.setBackgroundResource(R.drawable.cust_list_selector);
 			}
 			
-			if (arr.get(position).pred.isRT) {
+			if (!Manager.isScheduleApp()) {
 				sched.setText("Real Time Predictions");
 				sched.setTextColor(0xFF009900);
 			} else {

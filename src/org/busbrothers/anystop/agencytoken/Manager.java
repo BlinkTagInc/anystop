@@ -628,14 +628,18 @@ public class Manager {
     	String s;
     	String rq;
     	
+    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2.jsp?";
+    	if(Manager.getAgencyTag().equals("thebus"))
+    		rq_url = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2Hawaii.jsp?";
+    	
     	if(Manager.isHybridAgency())
-    		rq = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2.jsp?" +
+    		rq = rq_url +
     			"&latitude=" + loc.getLatitude()*10 +
     			"&longitude=" + loc.getLongitude()*10 +
     			"&agency="+Manager.getScheduleTableName() + 
     			"&agency2="+string;
     	else 
-    		rq = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2.jsp?" +
+    		rq = rq_url +
 				"&latitude=" + loc.getLatitude()*10 +
 				"&longitude=" + loc.getLongitude()*10 +
 				"&agency="+string;
@@ -704,8 +708,12 @@ public class Manager {
     	if(Manager.getAgencyName().equals("TriMet"))
     		route = Utils.getLeadingDigits(route);
     	
+    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLSingleStop.jsp?";
+    	if(Manager.getAgencyTag().equals("thebus"))
+    		rq_url = "http://feed.busbrothers.org/ClosestStops/XMLSingleStopHawaii.jsp?";
+    	
     	if(useAlternateTable) {
-    		rq = "http://feed.busbrothers.org/ClosestStops/XMLSingleStop.jsp?" +
+    		rq = rq_url +
 			"&agencyName="+ URLEncoder.encode(a.name) +
 			"&predictionType="+ URLEncoder.encode("schedule") +
 			"&tableName="+ URLEncoder.encode(getScheduleTableName()) + 
@@ -713,7 +721,7 @@ public class Manager {
 			"&intersection=" + URLEncoder.encode(intersection);
     	}
     	else {
-    		rq = "http://feed.busbrothers.org/ClosestStops/XMLSingleStop.jsp?" +
+    		rq = rq_url +
 			"&agencyName="+ URLEncoder.encode(a.name) +
 			"&predictionType="+ URLEncoder.encode(a.isRTstr) +
 			"&tableName="+ URLEncoder.encode(a.table) + 
@@ -721,7 +729,7 @@ public class Manager {
 			"&intersection=" + URLEncoder.encode(intersection);
     	}
     	
-    	Log.v(activityNameTag, "getRoutStopsPredsXML using URL=" + rq);
+    	Log.v(activityNameTag, "getRouteStopsPredsXML using URL=" + rq);
     	
     	System.out.println(rq);
     	Manager.lastRequest = rq;

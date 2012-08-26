@@ -29,23 +29,32 @@
     
     <!-- Agency settings -->
     
-    <string name="agencyName">pace-suburban-bus-service</string>
+    <!-- <string name="agencyName">milwaukee_county_transit_system</string>
+    <string name="agencyTable">milwaukee_county_transit_system</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">milwaukeecounty</string>
+    <string name="agencyLong">Milwaukee County Transit System</string>
+    <string name="agencyShort">Milwaukee MCTS</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">pace-suburban-bus-service</string>
     <string name="agencyTable">pace_suburban_bus_service</string>
     <string name="agencyPredictionType">schedule</string>
     <string name="agencyTag">pace-suburban-bus-service</string>
     <string name="agencyLong">Pace Suburban Bus Service</string>
     <string name="agencyShort">Pace</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
-    <!--  <string name="agencyName">thebus</string>
+    <string name="agencyName">thebus</string>
     <string name="agencyTable">thebus</string>
     <string name="agencyPredictionType">schedule</string>
     <string name="agencyTag">thebus</string>
     <string name="agencyLong">TheBus</string>
     <string name="agencyShort">Honolulu</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>
     
     <!-- <string name="agencyName">metropolitan_transit_authority_of_harris_county</string>
     <string name="agencyTable">metropolitan_transit_authority_of_harris_county</string>

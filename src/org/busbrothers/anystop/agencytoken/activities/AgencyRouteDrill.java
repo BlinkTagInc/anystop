@@ -334,7 +334,7 @@ public class AgencyRouteDrill extends CustomList {
 			//user whether predictions are real-time or not
 			//We assume that all stops on a given route are either all Real-Time, or not.
 			if(position==0) {
-				context.isRealTimeSchedule(arr.get(position).pred.isRT);
+				context.isRealTimeSchedule(!Manager.isScheduleApp());
 			}
 			
 			/*if (arr.get(position).pred.isRT) {

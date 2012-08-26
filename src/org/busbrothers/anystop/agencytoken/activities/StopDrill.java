@@ -307,11 +307,14 @@ public class StopDrill extends CustomList {
 			
 			ArrayList<String> preds = stop.pred.format();
 			//if(stops.size() > 0) b.append("\n");
+			
 			//Append to subtext the predictions for this stop
 			if (preds.size()==0) {
 				b.append("\nNo predictions at this time");
 			} else {
 				TableLayout predictionTable = (TableLayout) inflater.inflate(R.layout.predictiontable, null);
+				
+				boolean first_string = true;
 				
 				for (String s : preds) {
 					String [] predictionTime = s.split("-");
@@ -322,12 +325,23 @@ public class StopDrill extends CustomList {
 						TextView absTime = (TextView) tr.findViewById(R.id.abstime);
 						
 						deltaTime.setText(predictionTime[0]);
-						absTime.setText(predictionTime[1]);
+						
+						//Hax for TheBUS since TheBUS sometimes has real-time predictions for the next arrival
+						if(stop.pred.isRT && Manager.getAgencyTag().equals("thebus") && first_string) {
+							absTime.setText(predictionTime[1] + "( real-time)");
+							absTime.setTextColor(0xFF009900);
+							deltaTime.setTextColor(0xFF009900);
+						}
+						else 
+							absTime.setText(predictionTime[1]);
+						
 						
 						Manager.applyFonts(deltaTime);
 						Manager.applyFonts(absTime);
 						
 						predictionTable.addView(tr);
+						
+						first_string = false;
 					}
 					//b.append(s);
 					//if (preds.indexOf(s)!=preds.size()-1) {b.append("\n");};
@@ -337,7 +351,7 @@ public class StopDrill extends CustomList {
 				textSectionLL.addView(predictionTable);
 			}
 			
-			if (arr.get(position).pred.isRT) {
+			if (!Manager.isScheduleApp()) {
 				sched.setText("Real Time Predictions:");
 				sched.setTextColor(0xFF009900);
 			} else {

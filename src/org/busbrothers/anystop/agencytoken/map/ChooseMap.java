@@ -205,8 +205,11 @@ public class ChooseMap extends MapActivity {
 			public void onProviderDisabled(String provider) {}
     	};
     	//2nd parameter specifies minimum time between updates
-    	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 0, locationListener);
-    	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 0, locationListener);
+    	try { locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 0, locationListener); }
+    	catch (IllegalArgumentException e) {;}
+    	
+    	try { locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 0, locationListener); }
+    	catch (IllegalArgumentException e) {;}
         
         //Apply new typeface to all Views in this listview
         Manager.applyFonts((View) findViewById(R.id.mainlayout));
@@ -275,8 +278,12 @@ public class ChooseMap extends MapActivity {
 		Log.v(activityNameTag, "starting location provider...");
 		this.myLocationOverlay.enableMyLocation();
 		this.mapView.initLoc();
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 0, locationListener);
-		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 0, locationListener);
+		
+		try { locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 0, locationListener); }
+    	catch (IllegalArgumentException e) {;}
+    	
+    	try { locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 0, locationListener); }
+    	catch (IllegalArgumentException e) {;}
 		
 		LinearLayout adLayoutParent = (LinearLayout) findViewById(R.id.dlist_ad_holder); //this LinearLayout will contain the AdView
 		

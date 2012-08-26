@@ -54,10 +54,16 @@ public class MyView extends MapView implements LocationListener {
 	 */
 	public void initLoc() {
 		LocationManager lm = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_TO_REGISTER, 
-				MIN_METERS_TO_REGISTER, this);
-		lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_TO_REGISTER, 
-				MIN_METERS_TO_REGISTER, this);
+		
+		try {
+			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_TO_REGISTER, 
+					MIN_METERS_TO_REGISTER, this);
+		} catch (IllegalArgumentException e) {;}
+		
+		try {
+			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_TO_REGISTER, 
+					MIN_METERS_TO_REGISTER, this);
+		} catch (IllegalArgumentException e) {;}
 	}
 	
 	/** This method should be called when the parent Activity goes out of focus, either in onPause() (preferred) or in onStop().

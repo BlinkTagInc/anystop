@@ -305,7 +305,7 @@ public class StopList extends CustomList {
 					routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
 				}
 				
-				if (s.pred.isRT) {isReal = true;} else {isSched = true;}
+				if (!Manager.isScheduleApp()) {isReal = true;} else {isSched = true;}
 			}
 			if (position % 2 == 0) {
 				row.setBackgroundResource(R.drawable.cust_list_selector);
