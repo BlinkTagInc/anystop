@@ -9,6 +9,7 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
 import org.busbrothers.anystop.agencytoken.datacomponents.Route;
@@ -57,6 +58,7 @@ public class AgencyRouteDrill extends CustomList {
 	}*/
 	
 	//TextView selection;
+	boolean isASearchedActivity;
 	List<SimpleStop> arr; //!<The List of SimpleStop objects (representing transit stops) that will be displayed in this AgencyRouteDrill.
 	int nearest_stop_index; //!<The SimpleStop with this index in arr will be the nearest stop to the user's current location
 	Button mapButton, refresh;
@@ -91,7 +93,12 @@ public class AgencyRouteDrill extends CustomList {
 		if(Manager.routeMap == null) Log.w(activityNameTag, "routeMap was null");
 		if(Manager.stringTracker == null) Log.w(activityNameTag, "stringTracker was null");
 		
-		arr = Manager.routeMap.get(Manager.stringTracker);
+		
+		if(Manager.isWMATA()) arr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+		else arr = Manager.routeMap.get(Manager.stringTracker);
+		
+		isASearchedActivity = false;
+		
 		if (arr==null) {
 			this.setResult(-1);
 			this.finish();
@@ -190,6 +197,7 @@ public class AgencyRouteDrill extends CustomList {
 	@Override
 	protected void onNewIntent(Intent mIntent) { 
 		IconicAdapter theListAdapter = i;
+		isASearchedActivity = true;
 		
 		if(Intent.ACTION_SEARCH.equals(mIntent.getAction())) {
 			Log.v(activityNameTag, activityNameTag+" was opened AS A SEARCHED ACTIVITY.");
@@ -308,9 +316,9 @@ public class AgencyRouteDrill extends CustomList {
 			}
 			
 			//Fill in the subtext for each stop - direction & prediction data
-			StringBuilder b = new StringBuilder(arr.get(position).headSign);
+			StringBuilder b = new StringBuilder(Utils.checkHeadsign(arr.get(position).headSign));
 			Log.v(activityNameTag, "Headsign for stop " + arr.get(position).intersection + " was " + arr.get(position).headSign);
-			Log.v(activityNameTag, "Trimmed headsign for stop " + arr.get(position).intersection + " is " + Utils.fmtHeadsign(arr.get(position).headSign));
+			//Log.v(activityNameTag, "Trimmed headsign for stop " + arr.get(position).intersection + " is " + Utils.fmtHeadsign(arr.get(position).headSign));
 			
 			//Append to subtext the routes served by this stop
 			//As of 2011-12-19, this doesn't work; it would be nice to get it to work but it can't really be done efficiently the way the server
@@ -324,10 +332,13 @@ public class AgencyRouteDrill extends CustomList {
 			}*/
 			
 			//Append to subtext the predictions for this stop
-			ArrayList<String> preds = arr.get(position).pred.format();
-			for (String s : preds) {
-				b.append("\n");
-				b.append(s);
+			if(arr.get(position).pred != null) {
+				ArrayList<String> preds = arr.get(position).pred.format();
+
+				for (String s : preds) {
+					if(b.length() > 0) b.append("\n");
+					b.append(s);
+				}
 			}
 			
 			//If we are processing the first item, use its prediction status to set the title of the screen, telling the
@@ -365,7 +376,8 @@ public class AgencyRouteDrill extends CustomList {
 		}
 		public void run() {
 			try {
-				Manager.loadAgencyStopPred(
+				if(Manager.isWMATA()) WMATATransitDataManager.fetchPredictionsByStop(arr.get(Manager.positionTracker));
+				else Manager.loadAgencyStopPred(
 						Manager.currAgency, 
 						Manager.routeTracker, 
 						arr.get(Manager.positionTracker).intersection);
@@ -467,6 +479,9 @@ public class AgencyRouteDrill extends CustomList {
 	public void onDestroy() {
 		//Determine if this AgencyRouteList was launched as a searched activity
 		Intent mIntent = getIntent(); //!<mIntent is just this Activity's intent
+		
+		//Pop the result stack if we are killing the ARL that was NOT a searched activity
+		WMATATransitDataManager.popCommand();
 		
 		super.onDestroy();
 	}

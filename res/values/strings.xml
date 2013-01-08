@@ -29,7 +29,7 @@
     
     <!-- Agency settings -->
     
-    <!-- <string name="agencyName">milwaukee_county_transit_system</string>
+    <!--<string name="agencyName">milwaukee_county_transit_system</string>
     <string name="agencyTable">milwaukee_county_transit_system</string>
     <string name="agencyPredictionType">schedule</string>
     <string name="agencyTag">milwaukeecounty</string>
@@ -37,6 +37,24 @@
     <string name="agencyShort">Milwaukee MCTS</string>
     <string name="agencyScheduleTable">na</string>
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">septa</string>
+    <string name="agencyTable">septa</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">septa</string>
+    <string name="agencyLong">SEPTA</string>
+    <string name="agencyShort">SEPTA</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <string name="agencyName">WMATA_Washington</string>
+    <string name="agencyTable">WMATA_Washington</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">wmatawashington</string>
+    <string name="agencyLong">WMATA Washington</string>
+    <string name="agencyShort">DC WMATA</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> 
     
     <!-- <string name="agencyName">pace-suburban-bus-service</string>
     <string name="agencyTable">pace_suburban_bus_service</string>
@@ -47,14 +65,14 @@
     <string name="agencyScheduleTable">na</string>
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
-    <string name="agencyName">thebus</string>
+    <!-- <string name="agencyName">thebus</string>
     <string name="agencyTable">thebus</string>
     <string name="agencyPredictionType">schedule</string>
     <string name="agencyTag">thebus</string>
     <string name="agencyLong">TheBus</string>
     <string name="agencyShort">Honolulu</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>-->
     
     <!-- <string name="agencyName">metropolitan_transit_authority_of_harris_county</string>
     <string name="agencyTable">metropolitan_transit_authority_of_harris_county</string>
@@ -151,8 +169,10 @@
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
     <!-- The below strings are used by ChooseMap to set up the MapView, to point to the right area -->
-    <string name="agencyLat">37336000</string>
-    <string name="agencyLon">-121893000</string>
+    <!-- <string name="agencyLat">37336000</string>
+    <string name="agencyLon">-121893000</string> -->
+    <string name="agencyLat">32715300</string>
+    <string name="agencyLon">-117156400</string>
     <string name="agencyZoomLevel">11</string>
     <!-- The below gets used to set the *minimum* zoom level for startmap -->
     <string name="agencyStopMapZoomLevel">16</string>

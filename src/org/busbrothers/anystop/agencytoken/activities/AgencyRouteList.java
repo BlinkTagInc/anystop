@@ -9,6 +9,7 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
 import org.busbrothers.anystop.agencytoken.datacomponents.Route;
@@ -94,7 +95,9 @@ public class AgencyRouteList extends CustomList {
 		//The below code will retrieve the Routes to be displayed in this RouteList
 		//Also it will filter them, (if there are search queries to filter by)
 		//Get arr, the List of Routes, from Manager
-		arr = Manager.agencyRoutes;
+		if(Manager.isWMATA()) arr = (ArrayList<Route>) WMATATransitDataManager.peekLastData();
+		else arr = Manager.agencyRoutes;
+		
 		if (arr==null) {
 			this.setResult(-1);
 			this.finish();
@@ -216,7 +219,8 @@ public class AgencyRouteList extends CustomList {
 				searchQueryStackIterator = searchQueryStack.iterator();
 				while(searchQueryStackIterator.hasNext()) {
 					String currQuery = searchQueryStackIterator.next();
-					passFilter = passFilter && currRoute.sName.toLowerCase().contains(currQuery.toLowerCase());
+					if(Manager.isWMATA()) passFilter = passFilter && currRoute.lName.toLowerCase().contains(currQuery.toLowerCase());
+					else passFilter = passFilter && currRoute.sName.toLowerCase().contains(currQuery.toLowerCase());
 				}
 				
 				if(!passFilter) positionsToFilter.add(currRoute);
@@ -341,7 +345,8 @@ public class AgencyRouteList extends CustomList {
 				Manager.stringTracker=arr.get(Manager.positionTracker).lName;
 				Manager.routeTracker=arr.get(Manager.positionTracker).sName;
 				try {
-					Manager.loadAgencyStop(Manager.currAgency, arr.get(Manager.positionTracker).sName);
+					if(Manager.isWMATA()) WMATATransitDataManager.fetchStopsByRoute(arr.get(Manager.positionTracker));
+					else Manager.loadAgencyStop(Manager.currAgency, arr.get(Manager.positionTracker).sName);
 				} catch (NoneFoundException e) {
 					errorHandler.sendEmptyMessage(0); return;
 				} catch (ServerBarfException e) {
@@ -440,6 +445,11 @@ public class AgencyRouteList extends CustomList {
 	public void onDestroy() {
 		//Determine if this AgencyRouteList was launched as a searched activity
 		Intent mIntent = getIntent(); //mIntent is just this Activity's intent
+		
+		//Pop the result stack if we are killing the ARL that was NOT a searched activity
+		Log.d("AgencyRouteList", "Clearing WMATATransitDataManager command");
+		WMATATransitDataManager.popCommand();
+		Log.d("AgencyRouteList", "Cleared WMATATransitDataManager command");
 		
 		super.onDestroy();
 	}

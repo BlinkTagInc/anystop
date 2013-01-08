@@ -573,6 +573,10 @@ public class Manager {
 		return(getRouteStopsXML(a, route, false));
 	}
 	
+	public static boolean isWMATA() {
+		return Manager.getAgencyTag().equals("wmatawashington");
+	}
+	
 	//useAlternateTable added to allow fetching from the schedule table
 	private static String getRouteStopsXML(Agency a, String route, boolean useAlternateTable) {
 		InputStream is;
@@ -628,9 +632,7 @@ public class Manager {
     	String s;
     	String rq;
     	
-    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2.jsp?";
-    	if(Manager.getAgencyTag().equals("thebus"))
-    		rq_url = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2Hawaii.jsp?";
+    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLClosestPredictions2Hawaii.jsp?";
     	
     	if(Manager.isHybridAgency())
     		rq = rq_url +
@@ -708,9 +710,7 @@ public class Manager {
     	if(Manager.getAgencyName().equals("TriMet"))
     		route = Utils.getLeadingDigits(route);
     	
-    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLSingleStop.jsp?";
-    	if(Manager.getAgencyTag().equals("thebus"))
-    		rq_url = "http://feed.busbrothers.org/ClosestStops/XMLSingleStopHawaii.jsp?";
+    	String rq_url = "http://feed.busbrothers.org/ClosestStops/XMLSingleStopHawaii.jsp?";
     	
     	if(useAlternateTable) {
     		rq = rq_url +
@@ -901,10 +901,13 @@ public class Manager {
 		flurryEventMap.put("Route", s.routeName);
 		flurryEventMap.put("Headsign", s.headSign);
 		flurryEventMap.put("Intersection", s.intersection);
-		flurryEventMap.put("RealTime", "" + s.pred.isRT);
+		
+		if(s.pred != null)
+			flurryEventMap.put("RealTime", "" + s.pred.isRT);
+		
 		FlurryAgent.logEvent("PredictionItem", flurryEventMap);
 		
-		Log.v("Manager", "flurryPredictionEvent called; parameters = {" + s.agency + ", " + s.routeName + ", " + s.headSign + ", " + s.intersection + ", " + s.pred.isRT + "}");
+		Log.v("Manager", "flurryPredictionEvent called; parameters = {" + s.agency + ", " + s.routeName + ", " + s.headSign + ", " + s.intersection + ", " + ((s.pred==null)?"null":s.pred.isRT) + "}");
 	}
 	
 	/** This method is called when the user select a Route to get information on.
@@ -1322,7 +1325,8 @@ public class Manager {
 		android:background="#000000" (check)
 		/>*/
 		
-		adview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 50));
+		adview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 
+				(int) (50 * caller.getResources().getDisplayMetrics().density)));
 		adview.setBackgroundColor(0x00000000);
 		adview.setActivity(caller);
 	}

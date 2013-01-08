@@ -303,7 +303,7 @@ public class StopDrill extends CustomList {
 			
 			StringBuilder b = new StringBuilder("");
 			
-			b.append("Direction: " + Utils.fmtHeadsign(stop.headSign));
+			b.append("Direction: " + Utils.fmtHeadsign(Utils.checkHeadsign(stop.headSign)));
 			
 			ArrayList<String> preds = stop.pred.format();
 			//if(stops.size() > 0) b.append("\n");

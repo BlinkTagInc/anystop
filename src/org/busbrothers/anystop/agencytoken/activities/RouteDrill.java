@@ -12,9 +12,11 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.AgencyRouteDrill.IconicAdapter;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
+import org.busbrothers.anystop.agencytoken.datacomponents.Prediction;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 import org.busbrothers.anystop.agencytoken.map.StopMap;
 import org.busbrothers.anystop.agencytoken.uicomponents.CustomList;
@@ -76,6 +78,8 @@ public class RouteDrill extends CustomList {
 	private boolean doAutoRefresh;
 	private int refresh_period_in_seconds;
 	
+	boolean isASearchedActivity;
+	
 	private boolean calledByAgencyRouteDrill = false;
 	
 	Stack <String> searchQueryStack = new Stack<String>(); /**<A Stack of search queries, which will ALL be used to filter
@@ -104,7 +108,10 @@ public class RouteDrill extends CustomList {
 		Log.v(activityNameTag, activityNameTag+" was opened, not in search, by " + callingActivity);
 		if(callingActivity.equals("AgencyRouteDrill"))calledByAgencyRouteDrill = true;
 		
-		tempArr = Manager.routeMap.get(Manager.stringTracker);
+		isASearchedActivity = false;
+		
+		if(Manager.isWMATA()) tempArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+		else tempArr = Manager.routeMap.get(Manager.stringTracker);
 		//Make sure that we were able to retrieve the things from tempArr 
 		if (tempArr==null) {
 			this.setResult(-1);
@@ -201,6 +208,7 @@ public class RouteDrill extends CustomList {
 	@Override
 	protected void onNewIntent(Intent mIntent) { 	
 		IconicAdapter theListAdapter = i; //aliasing
+		isASearchedActivity = true;
 		
 		if(Intent.ACTION_SEARCH.equals(mIntent.getAction())) {
 			Log.v(activityNameTag, activityNameTag+" was opened AS A SEARCHED ACTIVITY.");
@@ -367,9 +375,14 @@ public class RouteDrill extends CustomList {
 			StringBuilder b = new StringBuilder();
 			//Only append direction if NOT called by AgencyRouteDrill, since AgencyRouteDrill will later make the title (label) of
 			//this entry the Direction thus making the direction label redundant
-			if(!callingActivity.equals("AgencyRouteDrill")) b.append(Utils.fmtHeadsign(arr.get(position).headSign) + "\n"); 
+			if(!callingActivity.equals("AgencyRouteDrill")) b.append(Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)) + "\n"); 
 			//Append to subtext the routes served by this stop
-			ArrayList<SimpleStop> stops = Manager.stopMap.get(arr.get(position).intersection);
+			
+			ArrayList<SimpleStop> stops;
+			
+			if(Manager.isWMATA()) stops = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+			else stops = Manager.stopMap.get(arr.get(position).intersection);
+			
 			HashSet<String> routeNamesAlreadyListed = new HashSet<String>();
 			boolean first_entry = true;
 			if(stops.size() > 0) b.append("Routes Served: ");
@@ -384,13 +397,17 @@ public class RouteDrill extends CustomList {
 					routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
 				}
 			}
-			//if(stops.size() > 0) b.append("\n");
+
 			//Append to subtext the predictions for this stop
+			if(arr.get(position).pred == null) arr.get(position).pred = new Prediction(new int[0], true);
+			
 			ArrayList<String> preds = arr.get(position).pred.format();
 			if (preds.size()==0) {
 				b.append("\nNo predictions at this time");
 			} else {
 				TableLayout predictionTable = (TableLayout) inflater.inflate(R.layout.predictiontable, null);
+				
+				boolean first_stop = true;
 				
 				for (String s : preds) {
 					String [] predictionTime = s.split("-");
@@ -401,11 +418,21 @@ public class RouteDrill extends CustomList {
 						TextView absTime = (TextView) tr.findViewById(R.id.abstime);
 						
 						deltaTime.setText(predictionTime[0]);
-						absTime.setText(predictionTime[1]);
+						
+						//Hax for TheBUS since TheBUS sometimes has real-time predictions for the next arrival
+						if(arr.get(position).pred.isRT && Manager.getAgencyTag().equals("thebus") && first_stop) {
+							absTime.setText(predictionTime[1] + "( real-time)");
+							absTime.setTextColor(0xFF009900);
+							deltaTime.setTextColor(0xFF009900);
+							
+						}
+						else 
+							absTime.setText(predictionTime[1]);
 						
 						Manager.applyFonts(deltaTime);
 						Manager.applyFonts(absTime);
 						
+						first_stop=false;						
 						predictionTable.addView(tr);
 					}
 					//b.append(s);
@@ -439,7 +466,7 @@ public class RouteDrill extends CustomList {
 			else sched.setVisibility(View.GONE);
 			
 			//If we are calling this RouteDrill activity from AgencyRouteDrill then display direction as stop "name"
-			if(callingActivity.equals("AgencyRouteDrill")) label.setText("Direction: " + Utils.fmtHeadsign(arr.get(position).headSign));
+			if(callingActivity.equals("AgencyRouteDrill")) label.setText("Direction: " + Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)));
 			else label.setText(arr.get(position).intersection);
 			
 			content.setText(b.toString());
@@ -524,6 +551,9 @@ public class RouteDrill extends CustomList {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		
+		//Pop the result stack if we are killing the ARL that was NOT a searched activity
+		WMATATransitDataManager.popCommand();
 	}
 	
 	/**This method will attempt to refresh the prediction displayed on this RouteDrill screen. */

@@ -21,10 +21,24 @@ public class Utils {
 	 * @return Output headsign, without a leading "to"
 	 */
 	public static String fmtHeadsign(String headsignWord) {
+		if(headsignWord == null) return "";
+		
 		if(headsignWord.startsWith("To ") || headsignWord.startsWith("to ")) {
 			return headsignWord.substring(3);
 		}
 		else return headsignWord;
+	}
+	
+	/** This function is used to remove a headsign entirely, if the headsign is equal to
+	 * "no direction specified"
+	 * @param hs the headsign we read from a SimpleStop object
+	 * @return "" if the headsign was "no direction specified" else the headsign itself
+	 */
+	public static String checkHeadsign(String hs) {
+		if(hs == null) return "";
+		
+		if(hs.toLowerCase().contains("no direction specified")) return "";
+		else return hs;
 	}
 	
 	/**This function compares two Route names for "equality". Since the feed server sometimes adds extra '-'

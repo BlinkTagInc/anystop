@@ -36,6 +36,7 @@ public class Prediction implements Serializable {
 		super();
 		Date now = new Date();
 		this.predsSecs = new ArrayList<Long>();
+		
 		for (int p : predsSecs) {
 			this.predsSecs.add(now.getTime()+p*60*1000);
 		}

@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.datacomponents.Agency;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
@@ -104,6 +105,8 @@ public class StopsTime extends Activity{
     	if(Manager.isHybridAgency())
     		Manager.setScheduleTableName(getString(R.string.agencyScheduleTable));
     	
+    	if(Manager.isWMATA()) WMATATransitDataManager.reset(); //initialize and clear existing data structures, just in case
+    	
     	//Set up Admob APIK and keywords; also set up AdWhirl stuff but as of 2011-12-04 it's not being used yet
     	String adsapik = getString(R.string.BBadmobAPIK);
     	String adwhirlAPIK = getString(R.string.BBadwhirlAPIK);
@@ -154,15 +157,7 @@ public class StopsTime extends Activity{
     	
     	PickAg.setText("All routes for " + Manager.getShortName());
     	
-//    	NearAg.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//            	Manager.viewing=Manager.AGENCY;
-//            	LaxPositionThread t = new LaxPositionThread();
-//            	pp = ProgressDialog.show(me, "Local Agencies", "Determining Your Approximate Location", true, false);
-//            	t.start();
-//            }
-//        });
-    	
+    	//This is the button that gets all the routes for the agency
     	PickAg.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	Manager.viewing=Manager.AGENCY;
@@ -175,14 +170,6 @@ public class StopsTime extends Activity{
         		}
             }
         });
-        
-//    	favAgencies.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//            	Manager.agencies=new ArrayList<Agency>((HashSet<Agency>)Favorites.getInstance().getFavAgencies());
-//            	Intent i = new Intent(v.getContext(), AgencyList.class);
-//            	startActivityForResult(i,0);
-//            }
-//        });
         
     	favStops.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -259,8 +246,12 @@ public class StopsTime extends Activity{
 					a.table = Manager.getTableName();
 					a.isRTstr = Manager.get_predictionType();
 					Manager.currAgency = a;
-					Manager.loadAgencyRoutes(a);
+					
+					if(Manager.isWMATA()) WMATATransitDataManager.fetchAgencyRouteList();
+					else Manager.loadAgencyRoutes(a);
 				} catch (ServerBarfException e) {
+					errorHandler.sendEmptyMessage(1); return;
+				} catch (Exception e) {
 					errorHandler.sendEmptyMessage(1); return;
 				}
 				pd.dismiss();
@@ -340,8 +331,6 @@ public class StopsTime extends Activity{
 	protected void onStart() {
 		super.onStart();
 		
-		//Log.v(activityNameTag, "IsUseUsage is set to " + Manager.isUseUsage(this) + " right now.");
-		
 		if (Manager.isUseUsage(this) && first) {
 			//Below two lines commented out per to-do 55622789
 //			Toast t = Toast.makeText(this, "Welcome to " + getString(R.string.app_name) + "!", Toast.LENGTH_LONG);
@@ -374,6 +363,8 @@ public class StopsTime extends Activity{
 			Manager.flurryActivityOpenEvent(activityNameTag);
 			flurryEventLogged = true;
 		}
+		
+		if(Manager.isWMATA()) WMATATransitDataManager.reset(); //just in case, clear all stored searches
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
