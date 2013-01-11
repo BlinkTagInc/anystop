@@ -17,6 +17,7 @@ import org.busbrothers.anystop.agencytoken.activities.AgencyRouteDrill.IconicAda
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
 import org.busbrothers.anystop.agencytoken.datacomponents.Prediction;
+import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 import org.busbrothers.anystop.agencytoken.map.StopMap;
 import org.busbrothers.anystop.agencytoken.uicomponents.CustomList;
@@ -52,6 +53,7 @@ import com.flurry.android.FlurryAgent;
 import com.google.ads.AdView;
 import com.sensedk.AswAdLayout;
 
+/** Note that RouteDrill may be called by both AgencyRouteDrill and RouteList */
 public class RouteDrill extends CustomList {
 
 	RouteDrill me;
@@ -489,8 +491,12 @@ public class RouteDrill extends CustomList {
 			// String lat = loc.getLatitude()+"";
 			// String lon = loc.getLongitude()+"";
 			try {
-				Manager.repeat();
+				if(Manager.isWMATA()) WMATATransitDataManager.repeat();
+				else Manager.repeat();
 			} catch (NoneFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ServerBarfException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -517,7 +523,9 @@ public class RouteDrill extends CustomList {
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
-				arr = Manager.routeMap.get(Manager.stringTracker);
+				if(Manager.isWMATA()) arr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+				else arr = Manager.routeMap.get(Manager.stringTracker);
+				
 				if (arr==null) {
 					me.setResult(-1);
 					me.finish();

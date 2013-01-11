@@ -194,6 +194,7 @@ public class StopsTime extends Activity{
             }
         });
     	
+    	//This is the button for "find near me"
     	locate.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	Manager.viewing=Manager.CHOOSEMAP;

@@ -6,17 +6,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.AgencyRouteList;
 import org.busbrothers.anystop.agencytoken.activities.EditPrefs;
 import org.busbrothers.anystop.agencytoken.activities.RouteList;
 import org.busbrothers.anystop.agencytoken.activities.StopList;
 import org.busbrothers.anystop.agencytoken.datacomponents.Agency;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
+import org.busbrothers.anystop.agencytoken.datacomponents.Route;
 import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
+import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 
 
 import android.app.Activity;
@@ -445,25 +450,7 @@ public class ChooseMap extends MapActivity {
 	
 	class DataThread extends Thread {
 		public void run() {
-			if (Manager.viewing==Manager.ROUTES || Manager.viewing==Manager.STOPS) {
-				//Date starttime = new Date();
-				Manager.clearStops();
-
-				Location loc = new Location("faked");
-				loc.setLatitude(startpoint.getLatitudeE6()/10e6);
-				loc.setLongitude(startpoint.getLongitudeE6()/10e6);
-				try {
-					Manager.loadNearStops(loc, Manager.getTableName());
-				} catch (NoneFoundException e) {
-					errorHandler.sendEmptyMessage(0); return;
-				} //Needs to be threaded itself!
-				catch (ServerBarfException e) {
-					errorHandler.sendEmptyMessage(1); return;
-				}
-				pd.dismiss();
-				stact.sendEmptyMessage(0);
-			}
-			else if (Manager.viewing == Manager.AGENCY || Manager.viewing == Manager.FAVROUTES) {
+			if (Manager.viewing == Manager.AGENCY || Manager.viewing == Manager.FAVROUTES) {
 				try {
 					Agency a = new Agency();
 					a.name = Manager.getAgencyDisplayName();
@@ -476,6 +463,72 @@ public class ChooseMap extends MapActivity {
 				}
 				pd.dismiss();
 				stact.sendEmptyMessage(0);
+			}
+			
+			else if(Manager.isWMATA()) {
+				if (Manager.viewing==Manager.ROUTES) {
+					//Date starttime = new Date();
+					Manager.clearStops();
+					
+					Log.d("ChooseMap", "Got to here!");
+	
+					Location loc = new Location("faked");
+					loc.setLatitude(startpoint.getLatitudeE6()/10e6);
+					loc.setLongitude(startpoint.getLongitudeE6()/10e6);
+					try {
+						WMATATransitDataManager.fetchRoutesByLocation(loc);
+					} catch (ServerBarfException e) {
+						errorHandler.sendEmptyMessage(1); return;
+					}
+					
+					HashMap<Route, ArrayList<SimpleStop>> retval = 
+							(HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
+					
+					if(retval == null || retval.keySet().size() == 0) {
+						errorHandler.sendEmptyMessage(0); return;
+					}
+					
+					pd.dismiss();
+					stact.sendEmptyMessage(0);
+				} else if (Manager.viewing==Manager.STOPS) {
+					//Date starttime = new Date();
+					Manager.clearStops();
+	
+					Location loc = new Location("faked");
+					loc.setLatitude(startpoint.getLatitudeE6()/10e6);
+					loc.setLongitude(startpoint.getLongitudeE6()/10e6);
+					try {
+						Manager.loadNearStops(loc, Manager.getTableName());
+					} catch (NoneFoundException e) {
+						errorHandler.sendEmptyMessage(0); return;
+					} //Needs to be threaded itself!
+					catch (ServerBarfException e) {
+						errorHandler.sendEmptyMessage(1); return;
+					}
+					pd.dismiss();
+					stact.sendEmptyMessage(0);
+				}
+				
+			} else {
+				if (Manager.viewing==Manager.ROUTES || Manager.viewing==Manager.STOPS) {
+					//Date starttime = new Date();
+					Manager.clearStops();
+	
+					Location loc = new Location("faked");
+					loc.setLatitude(startpoint.getLatitudeE6()/10e6);
+					loc.setLongitude(startpoint.getLongitudeE6()/10e6);
+					try {
+						Manager.loadNearStops(loc, Manager.getTableName());
+					} catch (NoneFoundException e) {
+						errorHandler.sendEmptyMessage(0); return;
+					} //Needs to be threaded itself!
+					catch (ServerBarfException e) {
+						errorHandler.sendEmptyMessage(1); return;
+					}
+					pd.dismiss();
+					stact.sendEmptyMessage(0);
+				}
+				
 			}
 
 		}

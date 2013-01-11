@@ -9,6 +9,7 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.AgencyRouteDrill.IconicAdapter;
 import org.busbrothers.anystop.agencytoken.datacomponents.Agency;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
@@ -319,7 +320,9 @@ public class FavStops extends CustomList {
 					a.table = Manager.getTableName();
 					a.isRTstr = Manager.get_predictionType();
 					Manager.currAgency = a;
-					Manager.loadAgencyRoutes(a);
+					
+					if(Manager.isWMATA()) WMATATransitDataManager.fetchAgencyRouteList();
+					else Manager.loadAgencyRoutes(a);
 				} catch (ServerBarfException e) {
 					errorHandler.sendEmptyMessage(1); return;
 				}
@@ -328,7 +331,9 @@ public class FavStops extends CustomList {
 			}
 			else {
 				try {
-					Manager.loadStop(arr.get(Manager.positionTracker));
+					Log.d("FavStops", "Getting array position " + Manager.positionTracker + " from array of length " + arr.size());
+					if(Manager.isWMATA()) WMATATransitDataManager.fetchPredictionsByStop(arr.get(Manager.positionTracker));
+					else Manager.loadStop(arr.get(Manager.positionTracker));
 				} catch (NoneFoundException e) {
 					errorHandler.sendEmptyMessage(0); return;
 				} catch (ServerBarfException e) {
@@ -487,7 +492,6 @@ public class FavStops extends CustomList {
 	 * That's it */
 	@Override
 	public void onDestroy() {
-		
 		super.onDestroy();
 	}
 	

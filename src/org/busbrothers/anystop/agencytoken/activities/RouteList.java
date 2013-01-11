@@ -3,6 +3,7 @@ package org.busbrothers.anystop.agencytoken.activities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -11,10 +12,12 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.FavRoutes.IconicAdapter;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
 import org.busbrothers.anystop.agencytoken.datacomponents.Route;
+import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 import org.busbrothers.anystop.agencytoken.datacomponents.SpecialSort;
 import org.busbrothers.anystop.agencytoken.uicomponents.CustomList;
@@ -62,6 +65,7 @@ public class RouteList extends CustomList {
 
 	// TextView selection;
 	ArrayList<String> arr;
+	
 	IconicAdapter theListAdapter;
 	
 	Button mapButton;
@@ -88,8 +92,20 @@ public class RouteList extends CustomList {
 		
 		Log.v(activityNameTag, activityNameTag+" was opened, but not in a search.");
 
-		String[] actions = new String[Manager.routeMap.keySet().size()];
-		List<String> tempArr = Arrays.asList(Manager.routeMap.keySet().toArray(actions));
+		String[] actions;
+		List<String> tempArr;
+		
+		if(Manager.isWMATA()) {
+			Set<Route> routes = ((HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData()).keySet();
+			
+			tempArr = new ArrayList<String>();
+			for(Route r : routes) tempArr.add(r.lName);
+		}
+		else {
+			actions = new String[Manager.routeMap.keySet().size()];
+			tempArr = Arrays.asList(Manager.routeMap.keySet().toArray(actions));
+		}
+		
 		arr = new ArrayList<String>();
 
 		if (tempArr == null) {
@@ -205,18 +221,27 @@ public class RouteList extends CustomList {
 	
 	public void onListItemClick(ListView parent, View v, int position, long id) {
 		super.onListItemClick(parent, v, position, id);
+		
+		//TODO: fixme
 		Manager.stringTracker = arr.get(position);
 		Manager.routeTracker = arr.get(position);
 		
 		Manager.flurryRouteSelectEvent(arr.get(position));
-
-		v.postDelayed(new Runnable() {
-            public void run() {
-            	Intent rdIntent = new Intent(me, RouteDrill.class);
-            	rdIntent.putExtra("CallingActivity", activityNameTag);
-            	startActivityForResult(rdIntent, 0);
-            }
-        }, super.getAnimationTime());
+		
+		if(Manager.isWMATA() ) {
+			handler.sendEmptyMessage(0);
+		}
+		
+		
+		else {
+			v.postDelayed(new Runnable() {
+	            public void run() {
+	            	Intent rdIntent = new Intent(me, RouteDrill.class);
+	            	rdIntent.putExtra("CallingActivity", activityNameTag);
+	            	startActivityForResult(rdIntent, 0);
+	            }
+	        }, super.getAnimationTime());
+		}
 	}
 	
 	/** This method overrides onSearchRequested(); it will pause this activity and transfer control to the search dialog (unwillingly). 
@@ -249,26 +274,38 @@ public class RouteList extends CustomList {
 			Manager.applyFonts(row);
 
 			StringBuilder b = new StringBuilder("Nearest Stops:");
-			ArrayList<SimpleStop> stops = Manager.routeMap.get(arr
+			ArrayList<SimpleStop> stops = null;
+			
+			if(Manager.isWMATA() ) {
+				HashMap<Route, ArrayList<SimpleStop>> routeMap = (HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
+				
+				for(Route r : routeMap.keySet())
+					if(r.lName.equals(arr.get(position))) stops=routeMap.get(r);
+				
+			}
+			else stops = Manager.routeMap.get(arr
 					.get(position));
 			
-			Collections.sort(stops, new SpecialSort());
 			boolean isSched = false;
 			boolean isReal = false;
 			
-			SimpleStop prevStop = null;
-			for (SimpleStop s : stops) {
-				String intersection = s.intersection;
-				if (s.pred.isRT) {isReal = true;} else {isSched = true;}
+			if(stops != null) {
+				Collections.sort(stops, new SpecialSort());
 				
-				//Check to make sure we don't have duplicate stop names (SimpleStop.intersection) in our nearest stops list
-				if(prevStop == null)
-					b.append("\n" + intersection);
-				else if(!s.intersection.equals(prevStop.intersection))
-					b.append("\n" + intersection);
-				//else do nothing
-				
-				prevStop = s;
+				SimpleStop prevStop = null;
+				for (SimpleStop s : stops) {
+					String intersection = s.intersection;
+					if (s.pred == null || s.pred.isRT) {isReal = true;} else {isSched = true;}
+					
+					//Check to make sure we don't have duplicate stop names (SimpleStop.intersection) in our nearest stops list
+					if(prevStop == null)
+						b.append("\n" + intersection);
+					else if(!s.intersection.equals(prevStop.intersection))
+						b.append("\n" + intersection);
+					//else do nothing
+					
+					prevStop = s;
+				}
 			}
 			
 			//Figure out if we need to set checked or not, and also add listeners so that we add the Route to Favorites
@@ -327,7 +364,6 @@ public class RouteList extends CustomList {
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == -1) {
 			showError();
@@ -352,24 +388,6 @@ public class RouteList extends CustomList {
 		b.show();
 	}
 
-	class DataThread extends Thread {
-		public DataThread() {
-
-		}
-
-		public void run() {
-			Manager.clearStops();
-			try {
-				Manager.repeat();
-			} catch (NoneFoundException e) {
-				e.printStackTrace();
-			}
-			pd.dismiss();
-			stact.sendEmptyMessage(0);
-
-		}
-	};
-
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -384,15 +402,53 @@ public class RouteList extends CustomList {
 		};
 	};
 	
+	class DataThread extends Thread {
+		public DataThread() {
+
+		}
+
+		public void run() {
+			Manager.clearStops();
+			try {
+				if(Manager.isWMATA()) {
+					HashMap<Route, ArrayList<SimpleStop>> routeMap = (HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
+					
+					boolean found_one = false;
+					
+					for(Route r : routeMap.keySet()) {
+						if(r.lName.equals( Manager.stringTracker )) {
+							found_one = true;
+							
+							ArrayList<SimpleStop> stops=routeMap.get(r);
+							WMATATransitDataManager.fetchPredictionsByStops(stops);
+						}
+					}
+				} else Manager.repeat();
+			} catch (NoneFoundException e) {
+				e.printStackTrace();
+			} catch (ServerBarfException e) {
+				e.printStackTrace();
+			}
+			pd.dismiss();
+			stact.sendEmptyMessage(0);
+
+		}
+	};
+	
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
 			 Intent i = new Intent(me, RouteDrill.class);
+			 i.putExtra("CallingActivity", activityNameTag);
 			 startActivityForResult(i,0);
 		 }
 			
 	 };
-		private Handler waitmessage = new Handler() {
+	 
+	 
+	 
+	 
+		/*private Handler waitmessage = new Handler() {
 			@Override
 			
 			public void handleMessage(Message msg) {
@@ -403,7 +459,10 @@ public class RouteList extends CustomList {
 					t.show();
 				}
 			}
-		};
+		};*/
+	 
+	 
+	 
 		
 	/** Overrides the default onDestroy. Special things we do in AgencyRouteList.onDestroy():
 	 * 1. Nothing.
@@ -412,6 +471,7 @@ public class RouteList extends CustomList {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
 	}
 }
 

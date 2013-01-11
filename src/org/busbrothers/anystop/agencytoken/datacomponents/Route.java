@@ -19,6 +19,17 @@ public class Route implements Comparable<Route> {
 		return(returned);
 		
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if(other instanceof Route) return false;
+		
+		Route otherRoute = (Route) other;
+		if(otherRoute.sName.equals(sName) && 
+				otherRoute.lName.equals(lName)) return true;
+		
+		return false;
+	}
 
 	/** compareTo() compares two Routes. This is done using the compareToForRouteName() method. A description of the algorithm 
 	 * used is available in the header (method description?) of compareToForRouteName().

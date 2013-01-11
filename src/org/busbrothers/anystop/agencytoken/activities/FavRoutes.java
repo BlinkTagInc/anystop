@@ -10,6 +10,7 @@ package org.busbrothers.anystop.agencytoken.activities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,7 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.datacomponents.Agency;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
@@ -345,30 +347,49 @@ public class FavRoutes extends CustomList {
 
 		}
 		public void run() {
+			//This block gets exec'd when the user doesn't have any favroutes yet
 			if (Manager.viewing == Manager.AGENCY || Manager.viewing == Manager.FAVROUTES) {
+				//TODO: Update me to do the right thing when fetching agency stuff...
 				try {
 					Agency a = new Agency();
 					a.name = Manager.getAgencyDisplayName();
 					a.table = Manager.getTableName();
 					a.isRTstr = Manager.get_predictionType();
-					Manager.currAgency = a;
-					Manager.loadAgencyRoutes(a);
+					
+					if(Manager.isWMATA()) WMATATransitDataManager.fetchAgencyRouteList();
+					else Manager.loadAgencyRoutes(a);
 				} catch (ServerBarfException e) {
 					errorHandler.sendEmptyMessage(1); return;
 				}
 				pd.dismiss();
 				stact.sendEmptyMessage(0);
 			}
+			//This block gets executed when the user has selected a favroute to look up stops for
 			else {
-				Route routeObj = Manager.getRouteBylName(arr.get(Manager.positionTracker));
-				Manager.stringTracker=routeObj.lName;
-				Manager.routeTracker=routeObj.sName;
-				try {
-					Manager.loadAgencyStop(Manager.currAgency, routeObj.sName);
-				} catch (NoneFoundException e) {
+				//TODO: Update me for favroutes!
+				Route routeObj;
+				if(Manager.isWMATA()) {
+					HashMap<String, Route> lnameToRouteMap = new HashMap<String, Route>();
+					ArrayList<Route> data = (ArrayList<Route>) WMATATransitDataManager.peekLastData();
+					
+					for(Route r : data) lnameToRouteMap.put(r.lName, r);
+					routeObj = lnameToRouteMap.get(arr.get(Manager.positionTracker));
+				}
+				else routeObj = Manager.getRouteBylName(arr.get(Manager.positionTracker));
+				
+				if(routeObj != null) {
+					Manager.stringTracker=routeObj.lName;
+					Manager.routeTracker=routeObj.sName;
+					try {
+						if(Manager.isWMATA()) WMATATransitDataManager.fetchStopsByRoute(routeObj);
+						else Manager.loadAgencyStop(Manager.currAgency, routeObj.sName);
+					} catch (NoneFoundException e) {
+						errorHandler.sendEmptyMessage(0); return;
+					} catch (ServerBarfException e) {
+						errorHandler.sendEmptyMessage(1); return;
+					}
+				} else {
 					errorHandler.sendEmptyMessage(0); return;
-				} catch (ServerBarfException e) {
-					errorHandler.sendEmptyMessage(1); return;
 				}
 				pd.dismiss();
 				stact.sendEmptyMessage(0);
@@ -382,7 +403,7 @@ public class FavRoutes extends CustomList {
         	DataThread d = new DataThread();
         	
         	if (Manager.viewing==Manager.AGENCY || Manager.viewing==Manager.FAVROUTES) {
-        		pd = ProgressDialog.show(me, "Getting Route", "Contacting the Server:\nStops List", true, false);
+        		pd = ProgressDialog.show(me, "Getting Route", "Contacting the Server:\nRoutes List", true, false);
         	} else
         		pd = ProgressDialog.show(me, "Getting Route", "Contacting the Server:\nStops List", true, false);
         	
@@ -522,6 +543,8 @@ public class FavRoutes extends CustomList {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		
+		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
 	}
 	
 	/**

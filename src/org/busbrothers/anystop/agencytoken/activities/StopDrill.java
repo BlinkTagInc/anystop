@@ -9,8 +9,10 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.RouteDrill.IconicAdapter;
 import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
+import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 import org.busbrothers.anystop.agencytoken.map.StopMap;
 import org.busbrothers.anystop.agencytoken.uicomponents.CustomList;
@@ -49,9 +51,6 @@ import android.widget.Toast;
 public class StopDrill extends CustomList {
 
 	StopDrill me;
-	/*public static StopDrill single() {
-		return me;
-	}*/
 	
 	ProgressDialog pd;
 	//TextView selection;
@@ -89,8 +88,9 @@ public class StopDrill extends CustomList {
 		
 		Log.v(activityNameTag, activityNameTag+" was opened, but not in a search.");
 
-				
-		tempArr = Manager.stopMap.get(Manager.stringTracker);
+		if(Manager.isWMATA()) tempArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();	
+		else tempArr = Manager.stopMap.get(Manager.stringTracker);
+		
 		//Make sure that we were able to retrieve the things from tempArr 
 		if (tempArr==null) {
 			this.setResult(-1);
@@ -143,10 +143,15 @@ public class StopDrill extends CustomList {
     	
     	mapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	Manager.lat = arr.get(0).lat;
-            	Manager.lon = arr.get(0).lon;
-            	Intent i = new Intent(me, StopMap.class);
-        	 	startActivity(i);
+            	if(arr.size() > 0) {
+	            	Manager.lat = arr.get(0).lat;
+	            	Manager.lon = arr.get(0).lon;
+	            	Intent i = new Intent(me, StopMap.class);
+	        	 	startActivity(i);
+            	} else {
+            		Toast t = Toast.makeText(me, "Couldn't find any stops to display predictions for; cannot display location of stop.", Toast.LENGTH_LONG);
+    				t.show();
+            	}
             }
         });
     	
@@ -394,12 +399,17 @@ public class StopDrill extends CustomList {
 		}
 
 		public void run() {
+			//TODO: Fix for WMATA
 			Manager.clearStops();
 			// String lat = loc.getLatitude()+"";
 			// String lon = loc.getLongitude()+"";
 			try {
-				Manager.repeat();
+				//TODO: Fix for WMATA
+				if(Manager.isWMATA()) WMATATransitDataManager.repeat();
+				else Manager.repeat();
 			} catch (NoneFoundException e) {
+				e.printStackTrace();
+			} catch (ServerBarfException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -426,6 +436,7 @@ public class StopDrill extends CustomList {
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
+			 	//TODO: Fix for WMATA
 				arr = Manager.stopMap.get(Manager.stringTracker);
 				if (arr==null) {
 					me.setResult(-1);
@@ -460,6 +471,7 @@ public class StopDrill extends CustomList {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
 	}
 	
 	/**This method will attempt to refresh the prediction displayed on this StopDrill screen. */

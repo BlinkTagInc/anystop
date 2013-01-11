@@ -1,10 +1,14 @@
 package org.busbrothers.anystop.agencytoken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.busbrothers.anystop.agencytoken.datacomponents.Route;
 import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
+
+import android.location.Location;
+import android.util.Log;
 
 public class WMATATransitDataManager {
 	private static ArrayList<Integer> lastCommandStack;
@@ -14,6 +18,10 @@ public class WMATATransitDataManager {
 	private static final int COMMAND_FETCH_ROUTES = 0;
 	private static final int COMMAND_FETCH_STOPS_BY_ROUTE = 1;
 	private static final int COMMAND_FETCH_PREDICTIONS_BY_STOP = 2;
+	private static final int COMMAND_FETCH_NEAREST_ROUTES = 3;
+	private static final int COMMAND_FETCH_PREDICTIONS_MULTISTOP = 4;
+	
+	private static final String activitynametag = "WMATATransitDataManager";
 	
 	public static void reset() {
 		lastCommandStack = new ArrayList<Integer>();
@@ -26,23 +34,23 @@ public class WMATATransitDataManager {
 			ArrayList<Route> routeList = WMATATransitDataFetcher.fetchAgencyRouteList();
 			
 			if(routeList != null) {
-				System.err.println("Got some shit!");
+				Log.d(activitynametag, "Got some shit!");
 				lastCommandStack.add(COMMAND_FETCH_ROUTES);
 				lastResultStack.add(routeList);
 				lastFetchStack.add(new Object()); //add dummy object to lastFetchStack
 			} else {
-				System.err.println("Didn't get shit!");
+				Log.d(activitynametag, "Didn't get shit!");
 				throw new ServerBarfException();
 			}
 		} catch (Exception e) {
-			System.err.println("bananas: " + e);
+			Log.d(activitynametag, "bananas: " + e);
 			throw new ServerBarfException();
 		}
 	}
 	
 	public static void fetchStopsByRoute(Route r) throws ServerBarfException {
 		if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_ROUTES) {
-			System.err.println("Error for fetchStopsByRoute() - did not detect that last command fetched a route!");
+			Log.d(activitynametag, "Error for fetchStopsByRoute() - did not detect that last command fetched a route!");
 			throw new ServerBarfException();
 		}
 		
@@ -63,10 +71,11 @@ public class WMATATransitDataManager {
 	
 	public static void fetchPredictionsByStop(SimpleStop s) throws ServerBarfException {
 		//TODO: Maybe the conditions here will have to change...
-		if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_STOPS_BY_ROUTE) {
-			System.err.println("Error for fetchPredictionsByStop() - did not detect that last command fetched a route!");
+		//This isn't the right condition to check anyway since we can be fetching a stop from FavStops that was saved ages ago
+		/*if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_STOPS_BY_ROUTE) {
+			Log.d("Error for fetchPredictionsByStop() - did not detect that last command fetched a route!");
 			throw new ServerBarfException();
-		}
+		}*/
 		
 		try {
 			ArrayList<SimpleStop> predStopsList = WMATATransitDataFetcher.fetchPredictionsByStop(s);
@@ -80,6 +89,88 @@ public class WMATATransitDataManager {
 			}
 		} catch (Exception e) {
 			throw new ServerBarfException();
+		}
+	}
+	
+	public static void fetchPredictionsByStops(ArrayList<SimpleStop> stops) throws ServerBarfException {
+		try {
+			ArrayList<SimpleStop> predStopsList = WMATATransitDataFetcher.fetchPredictionsByStops(stops);
+			
+			if(predStopsList != null) {
+				lastCommandStack.add(COMMAND_FETCH_PREDICTIONS_MULTISTOP);
+				lastFetchStack.add(stops);
+				lastResultStack.add(predStopsList);
+			} else {
+				throw new ServerBarfException();
+			}
+		} catch (Exception e) {
+			throw new ServerBarfException();
+		}
+	}
+	
+	public static void fetchRoutesByLocation(Location loc) throws ServerBarfException {
+		try {
+			Log.d(activitynametag, "Got to here two!");
+			HashMap<Route, ArrayList<SimpleStop>> nearestRouteMap = 
+					WMATATransitDataFetcher.getNearestRoutes(loc.getLatitude(), loc.getLongitude());
+			
+			Log.d(activitynametag, "Got to here three!");
+			
+			if(nearestRouteMap != null) {
+				lastCommandStack.add(COMMAND_FETCH_NEAREST_ROUTES);
+				lastFetchStack.add(loc);
+				lastResultStack.add(nearestRouteMap);
+			} else {
+				throw new ServerBarfException();
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new ServerBarfException();
+		}
+	}
+	
+	public static void repeat() throws ServerBarfException {
+		if(lastCommandStack.size() == 0 || lastFetchStack.size() == 0) {
+			Log.w(activitynametag, "Error doing repeat - last command was null!");
+		}
+		
+		int last_command = lastCommandStack.get(lastCommandStack.size() - 1);
+		
+		Object lastResult = null;
+		if(lastResultStack.size() > 0)
+			lastResult = lastResultStack.get(lastResultStack.size() - 1);
+		
+		Object lastFetch;
+		lastFetch = lastFetchStack.get(lastFetchStack.size() - 1);
+		
+		try {
+			if(last_command == COMMAND_FETCH_ROUTES) {
+				popCommand();
+				fetchAgencyRouteList();
+			} else if (last_command == COMMAND_FETCH_STOPS_BY_ROUTE) {
+				Route r = (Route) lastFetchStack.get(lastFetchStack.size() - 1);
+				popCommand();
+				fetchStopsByRoute(r);
+			} else if (last_command == COMMAND_FETCH_PREDICTIONS_BY_STOP) {
+				SimpleStop r = (SimpleStop) lastFetchStack.get(lastFetchStack.size() - 1);
+				popCommand();
+				fetchPredictionsByStop(r);
+			} else if(last_command == COMMAND_FETCH_NEAREST_ROUTES) {
+				Location l = (Location) lastFetchStack.get(lastFetchStack.size() - 1);
+				popCommand();
+				fetchRoutesByLocation(l);
+			} else if(last_command == COMMAND_FETCH_PREDICTIONS_MULTISTOP) {
+				ArrayList<SimpleStop> stops = (ArrayList<SimpleStop>) lastFetchStack.get(lastFetchStack.size() - 1);
+				popCommand();
+				fetchPredictionsByStops(stops);
+			}
+		//If we get an exception, throw it, but restore the state of the stacks since
+		//it might just be a time-out or something
+		} catch (ServerBarfException e) {
+			lastCommandStack.add(last_command);
+			lastResultStack.add(lastResult);
+			lastFetchStack.add(lastFetch);
+			throw e;
 		}
 	}
 	

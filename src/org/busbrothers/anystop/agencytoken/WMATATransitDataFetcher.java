@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class WMATATransitDataFetcher {
 	public static final boolean USING_RT_FEED = true;
 	
@@ -18,8 +20,11 @@ public class WMATATransitDataFetcher {
 	public static final String WMATA_RAIL_ROUTES_URL = "http://api.wmata.com/Rail.svc/json/JLines";
 	public static final String WMATA_RAIL_STOPS_URL = "http://api.wmata.com/Rail.svc/json/JStations";
 	public static final String WMATA_RAIL_PREDICTIONS_URL = "http://api.wmata.com/StationPrediction.svc/json/GetPrediction/";
+	public static final String WMATA_RAIL_NEAREST_STATIONS_URL = "http://api.wmata.com/Rail.svc/json/JStationEntrances";
 	
 	private static final String WMATA_APIKEY="7j6wqja5t48cfkt2hw33ugp8";
+	
+	private static final String activitynametag = "WMATATransitDataFetcher";
 	
 	private static Route jsonToRoute(JSONObject routeObject) {
 		Route returned = new Route();
@@ -157,9 +162,16 @@ public class WMATATransitDataFetcher {
 	
 	/** returns a list of all stops/stations for a given route/line */
 	public static ArrayList<SimpleStop> fetchStopsByRoute(Route r) {
-		String url = WMATA_RAIL_STOPS_URL 
+		String url;
+		
+		if(r == null) {
+			url = WMATA_RAIL_STOPS_URL 
+					+ "?api_key=" + WMATA_APIKEY;
+		} else {
+			url = WMATA_RAIL_STOPS_URL 
 				+ "?LineCode=" + r.sName
 				+ "&api_key=" + WMATA_APIKEY;
+		}
 		
 		String jsonText = APIEndpointAccessUtils.jsonStringFromURLString(url);
 		
@@ -208,6 +220,91 @@ public class WMATATransitDataFetcher {
 		return(jsonToPrediction(s, jsonPredictionObjectArray));
 	}
 	
+	public static ArrayList<SimpleStop> fetchPredictionsByStops(ArrayList<SimpleStop> stops) {
+		ArrayList<SimpleStop> retval = new ArrayList<SimpleStop>();
+		
+		for(SimpleStop s : stops) {
+			ArrayList<SimpleStop> newStops = fetchPredictionsByStop(s);
+			
+			for(SimpleStop t : newStops) {
+				retval.add(s);
+			}
+		}
+		
+		return retval;
+	}
+	
+	public static HashMap<Route, ArrayList<SimpleStop>> getNearestRoutes(Double lat, Double lon) {
+		final int RADIUS_IN_METERS = 2000;
+		
+		//Get a list of the nearest route stop codes
+		ArrayList<String> nearestStopCodes = new ArrayList<String>();
+		
+		Log.d(activitynametag, "Nearest routes got params: " + lat + ", " + lon);
+		
+		String nearest_url = WMATA_RAIL_NEAREST_STATIONS_URL;
+		nearest_url +="?lat=" + Double.toString(lat*10);
+		nearest_url +="&lon=" + Double.toString(lon*10);
+		nearest_url +="&radius=" + Integer.toString(RADIUS_IN_METERS);
+		nearest_url += "&api_key=" + WMATA_APIKEY;
+		
+		Log.d(activitynametag, "Fetching nearest routes with URL: " + nearest_url);
+		
+		String jsonText = APIEndpointAccessUtils.jsonStringFromURLString(nearest_url);
+			
+		try {
+			JSONObject jsonObject = new JSONObject( jsonText ); 
+			JSONArray jsonEntrancesArray = jsonObject.getJSONArray("Entrances");
+			
+			for(int i = 0; i < ((10<jsonEntrancesArray.length())?10:jsonEntrancesArray.length()); i++) {
+				JSONObject stationEntrance = jsonEntrancesArray.getJSONObject(i);
+								
+				if(stationEntrance.has("StationCode1") && !stationEntrance.isNull("StationCode1")) {
+					nearestStopCodes.add(stationEntrance.getString("StationCode1"));
+				}
+				
+				if(stationEntrance.has("StationCode2") && !stationEntrance.isNull("StationCode2")) {
+					nearestStopCodes.add(stationEntrance.getString("StationCode2"));
+				}
+			}
+		} catch (JSONException e) {
+			System.err.println(e);
+			return null;
+		}
+		
+		ArrayList<Route> allRoutes = fetchAgencyRouteList();
+		HashMap<String, Route> routesNameToRoute = new HashMap<String, Route>();
+		for(Route r : allRoutes) {
+			routesNameToRoute.put(r.sName, r);
+		}
+		
+		ArrayList<SimpleStop> allStops = fetchStopsByRoute(null);
+		ArrayList<SimpleStop> nearStops = new ArrayList<SimpleStop>();
+		
+		for(SimpleStop s : allStops) {
+			if(nearestStopCodes.contains(s.stopcode)) {
+				nearStops.add(s);
+			}
+		}
+		
+		HashMap<Route, ArrayList<SimpleStop>> returned = new HashMap<Route, ArrayList<SimpleStop>>();
+		
+		for(SimpleStop s : nearStops) {
+			String [] routeCodes = s.routeName.split(",");
+			
+			for(int i = 0; i < routeCodes.length; i++) {
+				String routeCode = routeCodes[i];
+				if(routeCode.length() > 0 && routesNameToRoute.containsKey(routeCode)) {
+					Route r = routesNameToRoute.get(routeCode);
+					if(!returned.containsKey(r)) returned.put(r, new ArrayList<SimpleStop>());
+					returned.get(r).add(s);
+				}
+			}
+		}
+			
+		return(returned);		
+	}
+	
 	public static void main(String [] args) {
 		ArrayList<Route> routeList = fetchAgencyRouteList();
 		
@@ -235,6 +332,20 @@ public class WMATATransitDataFetcher {
 				
 				i++;
 			}
+		}
+		
+		System.out.println("Routes nearest to center of DC:");
+		HashMap<Route, ArrayList<SimpleStop>> nearestRoutes = getNearestRoutes(32.824552, -117.108978);
+		for(Route key : nearestRoutes.keySet()) {
+			System.out.print("Routes -> Stop : " + key.lName + " -> {" );
+			
+			ArrayList<SimpleStop> stops = nearestRoutes.get(key);
+			
+			for(SimpleStop s : stops) {
+				System.out.print(s.intersection + ",");
+			}
+			
+			System.out.println("}");
 		}
 	}
 }
