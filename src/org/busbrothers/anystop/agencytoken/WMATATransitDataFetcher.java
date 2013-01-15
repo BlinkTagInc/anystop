@@ -26,6 +26,65 @@ public class WMATATransitDataFetcher {
 	
 	private static final String activitynametag = "WMATATransitDataFetcher";
 	
+	//Stores a mapping of route code to Route object, for filling in route lists
+	//in SimpleStop objects
+	private static HashMap<String, Route> routesNameMap;
+	
+	public static void reset() {
+		routesNameMap = null;
+	}
+	
+	private static void fillInRoutesNameMap() {
+		routesNameMap = new HashMap<String, Route>();
+		
+		ArrayList<Route> allRoutes = fetchAgencyRouteList();
+		
+		for(Route r : allRoutes)
+			routesNameMap.put(r.sName, r);
+	}
+	
+	private static void fixSimpleStopRoutes(ArrayList<SimpleStop> sl) {
+		if(routesNameMap == null) {
+			fillInRoutesNameMap();
+		}
+		
+		for(SimpleStop s : sl)
+			fixSimpleStopRoutes(s, routesNameMap);
+	}
+	
+	private static void fixSimpleStopRoutes(SimpleStop s) {
+		if(routesNameMap == null) {
+			fillInRoutesNameMap();
+		}
+		
+		fixSimpleStopRoutes(s, routesNameMap);
+	}
+	
+	/** Stupid helper method. Takes a SimpleStop and transforms the route, which is a 
+	 * comma-delimited string of route codes, into a comma-delimited string of long
+	 * route names (requires being given a Route.sName -> Route map)
+	 * @param routeObject
+	 * @return
+	 */
+	private static void fixSimpleStopRoutes(SimpleStop s, HashMap<String, Route> map) {
+		if(s.routeName == null) return;
+		
+		String newRoutes = "";
+		String[] routeCodes = s.routeName.split(",");
+		
+		for(int i = 0; i < routeCodes.length; i++) {
+			if(!map.containsKey(routeCodes[i])) {
+				newRoutes += routeCodes[i];
+			} else {
+				newRoutes += map.get(routeCodes[i]).lName;
+			}
+			
+			if(i < routeCodes.length-1) newRoutes += ",";
+		}
+		
+		s.routeName = newRoutes;
+	}
+	
 	private static Route jsonToRoute(JSONObject routeObject) {
 		Route returned = new Route();
 		
@@ -42,6 +101,9 @@ public class WMATATransitDataFetcher {
 	}
 	
 	private static SimpleStop jsonToSimpleStop(JSONObject stopObject) {
+		return jsonToSimpleStop(stopObject, true);
+	}
+	private static SimpleStop jsonToSimpleStop(JSONObject stopObject, boolean do_fix_routes) {
 		SimpleStop returned = new SimpleStop();
 		returned.agency = Manager.getAgencyName();
 		returned.headSign="";
@@ -65,6 +127,9 @@ public class WMATATransitDataFetcher {
 		} catch (JSONException e) {
 			System.err.println(e);
 		}
+		
+		//convert the routeNames from a list of route codes to a list of human-readable route names
+		if(do_fix_routes) fixSimpleStopRoutes(returned);
 		
 		returned.isRTstr = USING_RT_FEED?"true":"false";
 		
@@ -100,11 +165,6 @@ public class WMATATransitDataFetcher {
 			
 			String[] keyComponents = key.split(";");
 			
-			/*public String routeName, dirName, headSign, intersection, agency, diruse, direction, table, isRTstr;
-			public String stopcode;
-			public Prediction pred; //!< Prediction associated with this stop.  
-			public int lat, lon;*/
-			
 			SimpleStop currStop = new SimpleStop();
 			currStop.agency = Manager.getAgencyName();
 			currStop.routeName = keyComponents[0];
@@ -123,8 +183,12 @@ public class WMATATransitDataFetcher {
 			currStop.pred = prediction;
 			
 			returned.add(currStop);
+			
+			Log.d(activitynametag, "Adding another stop to returned: " + currStop.routeName + ", " + currStop.headSign + ", " + currStop.intersection);
 		}
 		
+		//convert the routeNames from a list of route codes to a list of human-readable route names
+		fixSimpleStopRoutes(returned);
 		
 		return(returned);
 	}
@@ -157,11 +221,21 @@ public class WMATATransitDataFetcher {
 			System.out.println("No objects in jsonRouteObjectArray! Terminating...");
 		}
 		
+		//Fill in route name cache since it's convenient to do so now
+		if(routesNameMap == null) {
+			routesNameMap = new HashMap<String, Route>();
+			for(Route r : routeList)
+				routesNameMap.put(r.sName, r);
+		}
+		
 		return(routeList);		
 	}
 	
 	/** returns a list of all stops/stations for a given route/line */
 	public static ArrayList<SimpleStop> fetchStopsByRoute(Route r) {
+		return fetchStopsByRoute(r, true);
+	}
+	public static ArrayList<SimpleStop> fetchStopsByRoute(Route r, boolean do_fix_routes) {
 		String url;
 		
 		if(r == null) {
@@ -188,7 +262,7 @@ public class WMATATransitDataFetcher {
 			for(int i = 0; i < jsonStopObjectArray.length(); i++) {
 				//Build a route object from the JSon object
 				SimpleStop newStop;				
-				try { newStop = jsonToSimpleStop(jsonStopObjectArray.getJSONObject(i)); }
+				try { newStop = jsonToSimpleStop(jsonStopObjectArray.getJSONObject(i), do_fix_routes); }
 				catch (JSONException e) { System.err.println(e); newStop = null; }
 				
 				if(newStop != null) stopList.add(newStop);
@@ -196,7 +270,7 @@ public class WMATATransitDataFetcher {
 		} else {
 			System.out.println("No objects in jsonRouteObjectArray! Terminating...");
 		}
-		
+
 		return(stopList);
 	}
 	
@@ -227,7 +301,7 @@ public class WMATATransitDataFetcher {
 			ArrayList<SimpleStop> newStops = fetchPredictionsByStop(s);
 			
 			for(SimpleStop t : newStops) {
-				retval.add(s);
+				retval.add(t);
 			}
 		}
 		
@@ -278,7 +352,7 @@ public class WMATATransitDataFetcher {
 			routesNameToRoute.put(r.sName, r);
 		}
 		
-		ArrayList<SimpleStop> allStops = fetchStopsByRoute(null);
+		ArrayList<SimpleStop> allStops = fetchStopsByRoute(null, false);
 		ArrayList<SimpleStop> nearStops = new ArrayList<SimpleStop>();
 		
 		for(SimpleStop s : allStops) {
@@ -291,6 +365,8 @@ public class WMATATransitDataFetcher {
 		
 		for(SimpleStop s : nearStops) {
 			String [] routeCodes = s.routeName.split(",");
+			//Since we're done with the routecodes for the stop, replace them with human-readable route names
+			fixSimpleStopRoutes(s, routesNameToRoute);
 			
 			for(int i = 0; i < routeCodes.length; i++) {
 				String routeCode = routeCodes[i];
@@ -303,6 +379,65 @@ public class WMATATransitDataFetcher {
 		}
 			
 		return(returned);		
+	}
+	
+	/** Assumes that lat and lon are actually /=10 from normal because for some reason
+	 * Location.getLongitude()/getLatitude() return it that way.
+	 * @param lat
+	 * @param lon
+	 * @return
+	 */
+	public static ArrayList<SimpleStop> getNearestStops(Double lat, Double lon) {
+		final int RADIUS_IN_METERS = 2000;
+		
+		//Get a list of the nearest route stop codes
+		ArrayList<String> nearestStopCodes = new ArrayList<String>();;
+		
+		String nearest_url = WMATA_RAIL_NEAREST_STATIONS_URL;
+		nearest_url +="?lat=" + Double.toString(lat*10);
+		nearest_url +="&lon=" + Double.toString(lon*10);
+		nearest_url +="&radius=" + Integer.toString(RADIUS_IN_METERS);
+		nearest_url += "&api_key=" + WMATA_APIKEY;
+		
+		String jsonText = APIEndpointAccessUtils.jsonStringFromURLString(nearest_url);
+			
+		try {
+			JSONObject jsonObject = new JSONObject( jsonText ); 
+			JSONArray jsonEntrancesArray = jsonObject.getJSONArray("Entrances");
+			
+			for(int i = 0; i < ((10<jsonEntrancesArray.length())?10:jsonEntrancesArray.length()); i++) {
+				JSONObject stationEntrance = jsonEntrancesArray.getJSONObject(i);
+								
+				if(stationEntrance.has("StationCode1") && !stationEntrance.isNull("StationCode1")) {
+					nearestStopCodes.add(stationEntrance.getString("StationCode1"));
+				}
+				
+				if(stationEntrance.has("StationCode2") && !stationEntrance.isNull("StationCode2")) {
+					nearestStopCodes.add(stationEntrance.getString("StationCode2"));
+				}
+			}
+		} catch (JSONException e) {
+			System.err.println(e);
+			return null;
+		}
+		
+		ArrayList<Route> allRoutes = fetchAgencyRouteList();
+		HashMap<String, Route> routesNameToRoute = new HashMap<String, Route>();
+		for(Route r : allRoutes) {
+			routesNameToRoute.put(r.sName, r);
+		}
+		
+		ArrayList<SimpleStop> allStops = fetchStopsByRoute(null);
+		ArrayList<SimpleStop> nearStops = new ArrayList<SimpleStop>();
+		
+		for(SimpleStop s : allStops) {
+			if(nearestStopCodes.contains(s.stopcode)) {
+				//fixSimpleStopRoutes(s, routesNameToRoute);
+				nearStops.add(s);
+			}
+		}
+		
+		return(nearStops);		
 	}
 	
 	public static void main(String [] args) {

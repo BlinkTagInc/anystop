@@ -2,6 +2,7 @@ package org.busbrothers.anystop.agencytoken.activities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -114,6 +115,7 @@ public class StopDrill extends CustomList {
 				//}
 			}
 			
+			arr = filterDuplicatesByIntersectionName(arr);
 			Collections.sort(arr);
 			i = new IconicAdapter(this);
 			setListAdapter(i);
@@ -399,14 +401,12 @@ public class StopDrill extends CustomList {
 		}
 
 		public void run() {
-			//TODO: Fix for WMATA
-			Manager.clearStops();
-			// String lat = loc.getLatitude()+"";
-			// String lon = loc.getLongitude()+"";
 			try {
-				//TODO: Fix for WMATA
 				if(Manager.isWMATA()) WMATATransitDataManager.repeat();
-				else Manager.repeat();
+				else {
+					Manager.clearStops();
+					Manager.repeat();
+				}
 			} catch (NoneFoundException e) {
 				e.printStackTrace();
 			} catch (ServerBarfException e) {
@@ -436,12 +436,14 @@ public class StopDrill extends CustomList {
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
-			 	//TODO: Fix for WMATA
-				arr = Manager.stopMap.get(Manager.stringTracker);
+			 	if(Manager.isWMATA()) arr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();	
+			 	else arr = Manager.stopMap.get(Manager.stringTracker);
+			 	
 				if (arr==null) {
 					me.setResult(-1);
 					me.finish();
 				}else {
+					arr = filterDuplicatesByIntersectionName(arr);
 					Collections.sort(arr);
 					i.notifyDataSetChanged();
 					me.setResult(0);
@@ -451,18 +453,21 @@ public class StopDrill extends CustomList {
 			
 	 };
 	 
-	private Handler waitmessage = new Handler() {
-		@Override
-		
-		public void handleMessage(Message msg) {
-			Toast t;
-			while (!Manager.messageQueue.empty()) {
-				t= Toast.makeText(me, Manager.messageQueue.pop(), Toast.LENGTH_LONG);
-				
-				t.show();
-			}
-		}
-	};
+	 private ArrayList<SimpleStop> filterDuplicatesByIntersectionName(ArrayList<SimpleStop> stops) {
+		 HashSet<String> stopNames = new HashSet<String>();
+		 ArrayList<SimpleStop> returnedStops = new ArrayList<SimpleStop>();
+		 
+		 if(stops == null) return stops;
+		 
+		 for(SimpleStop s : stops) {
+			 if(!stopNames.contains(s.intersection)) {
+				returnedStops.add(s);
+				stopNames.add(s.intersection);
+			 } 
+		 }
+		 
+		 return returnedStops;
+	 }
 	
 	/** Overrides the default onDestroy. Special things we do in AgencyRouteList.onDestroy():
 	 * 1. Nothing.

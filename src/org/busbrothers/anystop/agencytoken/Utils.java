@@ -1,5 +1,8 @@
 package org.busbrothers.anystop.agencytoken;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.busbrothers.anystop.agencytoken.datacomponents.Route;
 
 public class Utils {
@@ -87,5 +90,44 @@ public class Utils {
 	
 	public static String useless() {
 		return "hi";
+	}
+	
+	/** Special for WMATA: Sort routes, putting those with the "r_" prefix at the top of the
+	 * given ArrayList routes. This is because routes prefixed with "r_" are rail routes and
+	 * are treated special
+	 * @param routes
+	 */
+	public static void sortRoutesBySpecial(List<Route> routes) {
+		if(routes == null) return;
+		
+		ArrayList<Route> toTheTop = new ArrayList<Route>();
+		
+		for(int i = routes.size()-1; i >= 0; i--) {
+			if(routes.get(i).lName.startsWith("r_")) {
+				toTheTop.add(i, routes.get(i));
+				routes.remove(i);
+			}
+		}
+		
+		for(int i = toTheTop.size()-1; i >= 0; i--) {
+			routes.add(0, toTheTop.get(i));
+		}
+	}
+	
+	public static void sortRoutesBySpecialString(ArrayList<String> routes) {
+		if(routes == null) return;
+		
+		ArrayList<String> toTheTop = new ArrayList<String>();
+		
+		for(int i = routes.size()-1; i >= 0; i--) {
+			if(routes.get(i).startsWith("r_")) {
+				toTheTop.add(i, routes.get(i));
+				routes.remove(i);
+			}
+		}
+		
+		for(int i = toTheTop.size()-1; i >= 0; i--) {
+			routes.add(0, toTheTop.get(i));
+		}
 	}
 }

@@ -3,6 +3,7 @@ package org.busbrothers.anystop.agencytoken.activities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,8 +12,13 @@ import java.util.Stack;
 import org.busbrothers.anystop.agencytoken.R;
 import org.busbrothers.anystop.agencytoken.Manager;
 import org.busbrothers.anystop.agencytoken.Utils;
+import org.busbrothers.anystop.agencytoken.WMATATransitDataManager;
 import org.busbrothers.anystop.agencytoken.activities.FavRoutes.IconicAdapter;
+import org.busbrothers.anystop.agencytoken.activities.RouteList.DataThread;
 import org.busbrothers.anystop.agencytoken.datacomponents.Favorites;
+import org.busbrothers.anystop.agencytoken.datacomponents.NoneFoundException;
+import org.busbrothers.anystop.agencytoken.datacomponents.Route;
+import org.busbrothers.anystop.agencytoken.datacomponents.ServerBarfException;
 import org.busbrothers.anystop.agencytoken.datacomponents.SimpleStop;
 import org.busbrothers.anystop.agencytoken.uicomponents.CustomList;
 import org.busbrothers.anystop.agencytoken.uicomponents.IndexCheck;
@@ -23,6 +29,7 @@ import com.sensedk.AswAdLayout;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
@@ -57,11 +64,14 @@ public class StopList extends CustomList {
 	//TextView selection;
 	ArrayList<String> arr;
 	List<SimpleStop> stopArr;
+	HashMap<String, SimpleStop> stopMap;
 	IconicAdapter theListAdapter;
 	
 	int nearest_stop_index;
 	Button mapButton;
 	int lastPosition;
+	
+	ProgressDialog pd;
 	
 	Button searchButton; //!<A button that will invoke the search dialog by calling onSearchRequested().
 	
@@ -87,9 +97,23 @@ public class StopList extends CustomList {
 		setContentView(R.layout.stoplist);
 		
 		Log.v(activityNameTag, activityNameTag+" was opened, but not in a search.");
+		
+		List<String> tempArr;
 
-		String[] actions = new String[Manager.stopMap.keySet().size()];
-		List<String> tempArr = Arrays.asList(Manager.stopMap.keySet().toArray(actions));
+		if(Manager.isWMATA()) {
+			stopArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData(); 
+			tempArr = new ArrayList<String>();
+			stopMap = new HashMap<String, SimpleStop>();
+			
+			for(SimpleStop s : stopArr) {
+				tempArr.add(s.intersection);
+				stopMap.put(s.intersection, s);
+			}
+			
+		} else {
+			String[] actions = new String[Manager.stopMap.keySet().size()];
+			tempArr = Arrays.asList(Manager.stopMap.keySet().toArray(actions));
+		}
 		
 		if (tempArr==null) {
 			this.setResult(-1);
@@ -97,22 +121,25 @@ public class StopList extends CustomList {
 		} else {
 			//Added to turn arr into an ArrayList that we can manipulate
 			arr = new ArrayList<String>();
-			for(String str : tempArr) arr.add(str);			
-			Collections.sort(arr);
+			for(String str : tempArr) arr.add(str);	
 			
-			//Find the nearest stop to the users's current location
-			stopArr = new ArrayList<SimpleStop>();
-			for(String stopName : arr) stopArr.add(Manager.stopMap.get(stopName).get(0));
-			SimpleStop nearestStop = Manager.getNearestStop(stopArr, this);
-
-			//If we find a nearest stop, put it at the top and remember it's position in the list so we can mark it as the nearest stop
-			if(nearestStop != null) {
-				int nearest_stop_index_old = stopArr.indexOf(nearestStop);
-				String nearestStopName = arr.remove(nearest_stop_index_old);
-				arr.add(0, nearestStopName);
-				nearest_stop_index = 0;
+			if(!Manager.isWMATA()) {
+				Collections.sort(arr);
+				
+				//Find the nearest stop to the users's current location
+				stopArr = new ArrayList<SimpleStop>();
+				for(String stopName : arr) stopArr.add(Manager.stopMap.get(stopName).get(0));
+				SimpleStop nearestStop = Manager.getNearestStop(stopArr, this);
+	
+				//If we find a nearest stop, put it at the top and remember it's position in the list so we can mark it as the nearest stop
+				if(nearestStop != null) {
+					int nearest_stop_index_old = stopArr.indexOf(nearestStop);
+					String nearestStopName = arr.remove(nearest_stop_index_old);
+					arr.add(0, nearestStopName);
+					nearest_stop_index = 0;
+				}
+				else nearest_stop_index = -1;
 			}
-			else nearest_stop_index = -1;
 			
 			SelfResizingTextView title = (SelfResizingTextView) findViewById(R.id.title);
 			title.setResizeParams(Manager.LISTWINDOW_START_FONTSIZE, Manager.LISTWINDOW_MIN_FONTSIZE, Manager.LISTWINDOW_MAX_NUMLINES, Manager.LISTWINDOW_MAX_HEIGHT);
@@ -161,7 +188,10 @@ public class StopList extends CustomList {
 			ArrayList<String> positionsToFilter = new ArrayList<String>();
 			for(int currentPosition = 0; currentPosition < theListAdapter.getCount(); currentPosition++) {
 				String currStopName = theListAdapter.getItem(currentPosition);
-				SimpleStop currStop = Manager.stopMap.get(currStopName).get(0);
+				SimpleStop currStop;
+				
+				if(Manager.isWMATA()) currStop = stopMap.get(currStopName);
+				else currStop = Manager.stopMap.get(currStopName).get(0);
 				boolean passFilter = true; //passFilter will remain set to true if currRoute matches all search queries in searchQueryStack.
 				
 				//For each Route, we go through the entire search query stack, comparing all queries against currRoute.sName
@@ -223,15 +253,24 @@ public class StopList extends CustomList {
 		lastPosition = position;
 		Manager.stringTracker=arr.get(position);
 		
-		SimpleStop predictedStop = Manager.stopMap.get(arr.get(position)).get(0);
+		//TODO: fixme (and call prediction for stop in DataThread)
+		SimpleStop predictedStop;
+		
+		if(Manager.isWMATA()) predictedStop = stopMap.get(arr.get(position));
+		else predictedStop = Manager.stopMap.get(arr.get(position)).get(0);
+		
 		if(predictedStop != null) Manager.flurryPredictionEvent(this, predictedStop);
 		else Log.d(activityNameTag, "Error in StopList - onListItemClick() could not set predictedStop correctly.");
 		
-		v.postDelayed(new Runnable() {
-            public void run() {
-            	startActivityForResult(new Intent(me, StopDrill.class),0);
-            }
-        }, super.getAnimationTime());
+		if(Manager.isWMATA()) {
+			handler.sendEmptyMessage(0);
+		} else {
+			v.postDelayed(new Runnable() {
+	            public void run() {
+	            	startActivityForResult(new Intent(me, StopDrill.class),0);
+	            }
+	        }, super.getAnimationTime());
+		}
     	
 	}
 	
@@ -270,7 +309,11 @@ public class StopList extends CustomList {
 						boolean isChecked) {
 					//mash agency name and intersection
 					if (((IndexCheck)buttonView).stopUpdate==true) {return;}
-					SimpleStop ag = Manager.stopMap.get(arr.get(((IndexCheck)buttonView).index)).get(0);
+					SimpleStop ag;
+					
+					if(Manager.isWMATA()) ag = stopMap.get(arr.get(((IndexCheck)buttonView).index)); 
+					else ag = Manager.stopMap.get(arr.get(((IndexCheck)buttonView).index)).get(0);
+					
 					if (isChecked) {
 						Favorites.getInstance().addStop(ag);
 						Toast t = Toast.makeText(me, "Added to Favorites", Toast.LENGTH_SHORT);
@@ -284,29 +327,39 @@ public class StopList extends CustomList {
 			});
 			Favorites favs = Favorites.getInstance();
 			check.stopUpdate=true;
-			check.setChecked(favs.checkStop(Manager.stopMap.get(arr.get(position)).get(0).agency+arr.get(position)));
+			
+			if(Manager.isWMATA()) check.setChecked(favs.checkStop(stopMap.get(arr.get(position)).agency+arr.get(position)));
+			else check.setChecked(favs.checkStop(Manager.stopMap.get(arr.get(position)).get(0).agency+arr.get(position)));
 			check.stopUpdate=false;
 			
 			StringBuilder b = new StringBuilder("Routes Served: ");
-			ArrayList<SimpleStop> stops = Manager.stopMap.get(arr.get(position));
-			HashSet<String> routeNamesAlreadyListed = new HashSet<String>();
 			boolean isSched = false;
 			boolean isReal = false;
-			
-			boolean isFirstRouteInb = true;
-			for (SimpleStop s : stops) {
-				//The below code makes sure to avoid duplicate listings in "Routes Served: <routes>"
-				if(!routeNamesAlreadyListed.contains(Utils.routeStripTrailing(s.routeName))) {
-					//Only prepend a comma if we are not the first route entry to be placed here 
-					if(isFirstRouteInb) isFirstRouteInb = false;
-					else b.append(", ");
-					
-					b.append(Utils.routeStripTrailing(s.routeName));
-					routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
-				}
+			//WMATA already have the correct route names and routes served encoded in routeName (as a comma-delimited list)
+			if(Manager.isWMATA()) {
+				b.append(stopMap.get(arr.get(position)).routeName);
+				isReal=true;
+			} else {
+				ArrayList<SimpleStop> stops = Manager.stopMap.get(arr.get(position));
+				HashSet<String> routeNamesAlreadyListed = new HashSet<String>();
 				
-				if (!Manager.isScheduleApp()) {isReal = true;} else {isSched = true;}
+				
+				boolean isFirstRouteInb = true;
+				for (SimpleStop s : stops) {
+					//The below code makes sure to avoid duplicate listings in "Routes Served: <routes>"
+					if(!routeNamesAlreadyListed.contains(Utils.routeStripTrailing(s.routeName))) {
+						//Only prepend a comma if we are not the first route entry to be placed here 
+						if(isFirstRouteInb) isFirstRouteInb = false;
+						else b.append(", ");
+						
+						b.append(Utils.routeStripTrailing(s.routeName));
+						routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
+					}
+					
+					if (!Manager.isScheduleApp()) {isReal = true;} else {isSched = true;}
+				}
 			}
+			
 			if (position % 2 == 0) {
 				row.setBackgroundResource(R.drawable.cust_list_selector);
 			}
@@ -332,7 +385,7 @@ public class StopList extends CustomList {
 				sched.setTextColor(0xFF28A400);
 			}*/
 			
-			if(position == nearest_stop_index) {
+			if( (Manager.isWMATA() && position == 0) || (!Manager.isWMATA() && position == nearest_stop_index) ) {
 				sched.setText("Nearest Stop");
 				sched.setTextColor(0xFF009900);
 			}
@@ -346,7 +399,6 @@ public class StopList extends CustomList {
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode==-1) {
 			showError();
@@ -373,7 +425,11 @@ public class StopList extends CustomList {
                 }
         });
         
-        SimpleStop errorStop = Manager.stopMap.get(arr.get(lastPosition)).get(0);
+        SimpleStop errorStop;
+        
+        if(Manager.isWMATA()) errorStop = stopMap.get(arr.get(lastPosition));
+        else errorStop= Manager.stopMap.get(arr.get(lastPosition)).get(0);
+        
         if(errorStop != null)
 	        Manager.flurryNoneFoundEvent(Manager.currAgency, 
 					Manager.routeTracker, 
@@ -385,19 +441,7 @@ public class StopList extends CustomList {
         b.show();
 	}
 		
-	private Handler waitmessage = new Handler() {
-		@Override
-		
-		public void handleMessage(Message msg) {
-			Toast t;
-			while (!Manager.messageQueue.empty()) {
-				t= Toast.makeText(me, Manager.messageQueue.pop(), Toast.LENGTH_LONG);
-				
-				t.show();
-			}
-		}
-	};
-	
+
 	/** Overrides the default onDestroy. Special things we do in AgencyRouteList.onDestroy():
 	 * 1. Pop searchQueryStack, if this was launched through the search dialog.
 	 * 
@@ -405,6 +449,7 @@ public class StopList extends CustomList {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
 	}
 	
 	/** This method gets called by the iconic adapater to set the "Prediction or Schedule" status
@@ -433,4 +478,57 @@ public class StopList extends CustomList {
 			dirSched.setTextColor(0xFF28A400);
 		}
 	}
+
+	//Used to call DataThread from onListItemClick
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+
+			DataThread d = new DataThread();
+				pd = ProgressDialog.show(me, "Getting Stops",
+						"Contacting the Server:\nStops Near Me",
+						true, false);
+
+				d.start();
+
+		};
+	};
+	
+	//Used to fetch data fro the esrver
+	class DataThread extends Thread {
+		public DataThread() {
+
+		}
+
+		public void run() {
+			Manager.clearStops();
+			try {
+				if(Manager.isWMATA()) {
+					SimpleStop selectedStop = stopMap.get(Manager.stringTracker);
+					
+					if(selectedStop != null)
+						WMATATransitDataManager.fetchPredictionsByStop(selectedStop);
+				} else Manager.repeat();
+			} catch (NoneFoundException e) {
+				e.printStackTrace();
+			} catch (ServerBarfException e) {
+				e.printStackTrace();
+			}
+			pd.dismiss();
+			stact.sendEmptyMessage(0);
+
+		}
+	};
+	
+	//Used to launch the next activity (StopDrill) after DataThread returns
+	 private Handler stact = new Handler() {
+		 @Override
+		 public void handleMessage(Message msg) {
+			 Intent i = new Intent(me, StopDrill.class);
+			 i.putExtra("CallingActivity", activityNameTag);
+			 startActivityForResult(i,0);
+		 }
+			
+	 };
+
 }

@@ -20,6 +20,7 @@ public class WMATATransitDataManager {
 	private static final int COMMAND_FETCH_PREDICTIONS_BY_STOP = 2;
 	private static final int COMMAND_FETCH_NEAREST_ROUTES = 3;
 	private static final int COMMAND_FETCH_PREDICTIONS_MULTISTOP = 4;
+	private static final int COMMAND_FETCH_NEAREST_STOPS = 5;
 	
 	private static final String activitynametag = "WMATATransitDataManager";
 	
@@ -27,6 +28,8 @@ public class WMATATransitDataManager {
 		lastCommandStack = new ArrayList<Integer>();
 		lastFetchStack = new ArrayList<Object>();
 		lastResultStack =new ArrayList<Object>(); 
+		
+		WMATATransitDataFetcher.reset();
 	}
 	
 	public static void fetchAgencyRouteList() throws ServerBarfException {
@@ -110,16 +113,31 @@ public class WMATATransitDataManager {
 	
 	public static void fetchRoutesByLocation(Location loc) throws ServerBarfException {
 		try {
-			Log.d(activitynametag, "Got to here two!");
 			HashMap<Route, ArrayList<SimpleStop>> nearestRouteMap = 
 					WMATATransitDataFetcher.getNearestRoutes(loc.getLatitude(), loc.getLongitude());
-			
-			Log.d(activitynametag, "Got to here three!");
 			
 			if(nearestRouteMap != null) {
 				lastCommandStack.add(COMMAND_FETCH_NEAREST_ROUTES);
 				lastFetchStack.add(loc);
 				lastResultStack.add(nearestRouteMap);
+			} else {
+				throw new ServerBarfException();
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new ServerBarfException();
+		}
+	}
+	
+	public static void fetchStopsByLocation(Location loc) throws ServerBarfException {
+		try {
+			ArrayList<SimpleStop> nearestStops = 
+					WMATATransitDataFetcher.getNearestStops(loc.getLatitude(), loc.getLongitude());
+			
+			if(nearestStops != null) {
+				lastCommandStack.add(COMMAND_FETCH_NEAREST_STOPS);
+				lastFetchStack.add(loc);
+				lastResultStack.add(nearestStops);
 			} else {
 				throw new ServerBarfException();
 			}
@@ -163,6 +181,10 @@ public class WMATATransitDataManager {
 				ArrayList<SimpleStop> stops = (ArrayList<SimpleStop>) lastFetchStack.get(lastFetchStack.size() - 1);
 				popCommand();
 				fetchPredictionsByStops(stops);
+			} else if(last_command == COMMAND_FETCH_NEAREST_STOPS) {
+				Location l = (Location) lastFetchStack.get(lastFetchStack.size() - 1);
+				popCommand();
+				fetchStopsByLocation(l);
 			}
 		//If we get an exception, throw it, but restore the state of the stacks since
 		//it might just be a time-out or something

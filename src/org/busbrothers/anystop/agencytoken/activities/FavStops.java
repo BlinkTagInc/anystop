@@ -295,7 +295,9 @@ public class FavStops extends CustomList {
 			
 			label.setText(arr.get(position).intersection);
 			//content.setText("Direction: " + Utils.fmt(arr.get(position).dirName));
-			content.setText("Direction: " + Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)));
+			if(!Manager.isWMATA())
+				content.setText("Direction: " + Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)));
+			
 			ImageView icon=(ImageView)row.findViewById(R.id.icon);
 			return(row);
 		}

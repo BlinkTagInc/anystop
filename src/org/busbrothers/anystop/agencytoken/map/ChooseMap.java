@@ -469,8 +469,6 @@ public class ChooseMap extends MapActivity {
 				if (Manager.viewing==Manager.ROUTES) {
 					//Date starttime = new Date();
 					Manager.clearStops();
-					
-					Log.d("ChooseMap", "Got to here!");
 	
 					Location loc = new Location("faked");
 					loc.setLatitude(startpoint.getLatitudeE6()/10e6);
@@ -493,18 +491,25 @@ public class ChooseMap extends MapActivity {
 				} else if (Manager.viewing==Manager.STOPS) {
 					//Date starttime = new Date();
 					Manager.clearStops();
+					
+					Log.d("ChooseMap", "Got to here!");
 	
 					Location loc = new Location("faked");
 					loc.setLatitude(startpoint.getLatitudeE6()/10e6);
 					loc.setLongitude(startpoint.getLongitudeE6()/10e6);
 					try {
-						Manager.loadNearStops(loc, Manager.getTableName());
-					} catch (NoneFoundException e) {
-						errorHandler.sendEmptyMessage(0); return;
-					} //Needs to be threaded itself!
-					catch (ServerBarfException e) {
+						WMATATransitDataManager.fetchStopsByLocation(loc);
+					} catch (ServerBarfException e) {
 						errorHandler.sendEmptyMessage(1); return;
 					}
+					
+					ArrayList<SimpleStop> retval = 
+							(ArrayList<SimpleStop>)WMATATransitDataManager.peekLastData();
+					
+					if(retval == null || retval.size() == 0) {
+						errorHandler.sendEmptyMessage(0); return;
+					}
+					
 					pd.dismiss();
 					stact.sendEmptyMessage(0);
 				}

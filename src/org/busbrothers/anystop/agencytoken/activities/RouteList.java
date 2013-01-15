@@ -116,6 +116,8 @@ public class RouteList extends CustomList {
 			while(tempArrIterator.hasNext()) arr.add(tempArrIterator.next());
 			
 			Collections.sort(arr);
+			Utils.sortRoutesBySpecialString(arr);
+			
 			SelfResizingTextView title = (SelfResizingTextView) findViewById(R.id.title);
 			title.setResizeParams(Manager.LISTWINDOW_START_FONTSIZE, Manager.LISTWINDOW_MIN_FONTSIZE, Manager.LISTWINDOW_MAX_NUMLINES, Manager.LISTWINDOW_MAX_HEIGHT);
 			title.setText("Routes Near Me");
@@ -351,8 +353,14 @@ public class RouteList extends CustomList {
 				sched.setText("Predictions & Schedules");
 				sched.setTextColor(0xFF28A400);
 			}
+			
+			if(Manager.isWMATA()) {
+				String routeName = arr.get(position);
+				routeName.replace("r_", "");
+				label.setText(Utils.capFirst(routeName.trim()));
+			} else
+				label.setText(Utils.capFirst(arr.get(position).trim()));
 
-			label.setText(Utils.capFirst(arr.get(position).trim()));
 			content.setText(b.toString());
 			ImageView icon = (ImageView) row.findViewById(R.id.icon);
 			icon.setImageResource(R.drawable.rail);

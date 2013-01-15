@@ -120,6 +120,8 @@ public class FavRoutes extends CustomList {
 			this.finish();
 		}else {
 			Collections.sort(arr);
+			Utils.sortRoutesBySpecialString(arr);
+			
 			SelfResizingTextView title = (SelfResizingTextView) findViewById(R.id.title);
 			title.setResizeParams(Manager.LISTWINDOW_START_FONTSIZE, Manager.LISTWINDOW_MIN_FONTSIZE, Manager.LISTWINDOW_MAX_NUMLINES, Manager.LISTWINDOW_MAX_HEIGHT);
 			TextView subtitle = (TextView) findViewById(R.id.subtitle);
@@ -325,7 +327,13 @@ public class FavRoutes extends CustomList {
 				sched.setTextColor(0xFFE0B000);
 			} */
 
-			label.setText(Utils.capFirst(arr.get(position)));
+			if(Manager.isWMATA()) {
+				String routeName = arr.get(position);
+				routeName.replace("r_", "");
+				label.setText(Utils.capFirst(routeName.trim()));
+			} else
+				label.setText(Utils.capFirst(arr.get(position).trim()));
+			
 			ImageView icon=(ImageView)row.findViewById(R.id.icon);
 			//content.setText("Tap to view stops");
 			content.setHeight(3);

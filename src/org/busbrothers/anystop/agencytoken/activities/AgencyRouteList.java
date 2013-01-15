@@ -105,6 +105,8 @@ public class AgencyRouteList extends CustomList {
 			Log.d(activityNameTag, "AgencyRouteList has started sorting; arr has " + arr.size() + "members...");
 			long startSortTime = System.currentTimeMillis();
 			Collections.sort(arr);
+			Utils.sortRoutesBySpecial(arr);
+			
 			long endSortTime = System.currentTimeMillis();
 			Log.v(activityNameTag, "AgencyRoute sorting took " + (endSortTime-startSortTime)/1000.0 + 
 				" seconds to sort route names. Sorted " + arr.size() + " names.");
@@ -327,7 +329,14 @@ public class AgencyRouteList extends CustomList {
 			} 
 
 			Log.v(activityNameTag, "Route has sName=" + arr.get(position).sName + ", lName=" + arr.get(position).lName);
-			label.setText(Utils.capFirst(arr.get(position).lName.trim()));
+			
+			if(Manager.isWMATA()) {
+				String routeName = arr.get(position).lName;
+				routeName.replace("r_", "");
+				label.setText(Utils.capFirst(routeName.trim()));
+			} else
+				label.setText(Utils.capFirst(arr.get(position).lName.trim()));
+			
 			ImageView icon=(ImageView)row.findViewById(R.id.icon);
 			//content.setText("Tap to view stops");
 			//content.setHeight(3);

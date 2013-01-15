@@ -112,8 +112,24 @@ public class RouteDrill extends CustomList {
 		
 		isASearchedActivity = false;
 		
-		if(Manager.isWMATA()) tempArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+		if(Manager.isWMATA()) {
+			ArrayList<SimpleStop> fetchedArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+			tempArr = new ArrayList<SimpleStop>();
+			
+			ArrayList<String> intersectionsAlreadySeen = new ArrayList<String>();
+			
+			//Filter stops with identical intersections
+			for(SimpleStop s : fetchedArr) {
+				//if(!intersectionsAlreadySeen.contains(s.intersection)) {
+				if(true) {
+					tempArr.add(s);
+					intersectionsAlreadySeen.add(s.intersection);
+				}
+			}
+		}
+		
 		else tempArr = Manager.routeMap.get(Manager.stringTracker);
+		
 		//Make sure that we were able to retrieve the things from tempArr 
 		if (tempArr==null) {
 			this.setResult(-1);
@@ -377,28 +393,38 @@ public class RouteDrill extends CustomList {
 			StringBuilder b = new StringBuilder();
 			//Only append direction if NOT called by AgencyRouteDrill, since AgencyRouteDrill will later make the title (label) of
 			//this entry the Direction thus making the direction label redundant
-			if(!callingActivity.equals("AgencyRouteDrill")) b.append(Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)) + "\n"); 
+			if(!callingActivity.equals("AgencyRouteDrill")) {
+				if(arr.get(position).headSign != null && arr.get(position).headSign.length()<1)
+					b.append(Utils.fmtHeadsign(Utils.checkHeadsign(arr.get(position).headSign)) + "\n"); 
+			}
 			//Append to subtext the routes served by this stop
 			
 			ArrayList<SimpleStop> stops;
 			
+			//TODO: classcastexception right here???
 			if(Manager.isWMATA()) stops = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
 			else stops = Manager.stopMap.get(arr.get(position).intersection);
 			
 			HashSet<String> routeNamesAlreadyListed = new HashSet<String>();
 			boolean first_entry = true;
-			if(stops.size() > 0) b.append("Routes Served: ");
-			else Log.d(activityNameTag, "Couldn't get routes served for SimpleStop with intersection \"" + arr.get(position).intersection + "\"");
-			for (SimpleStop s : stops) {
-				//The below code makes sure to avoid duplicate listings in "Routes Served: <routes>"
-				if(!routeNamesAlreadyListed.contains(Utils.routeStripTrailing(s.routeName))) {
-					//Make sure to only pre-pend a comma to a routeName if it is NOT the first route name in the list
-					if(first_entry) first_entry = false;
-					else b.append(", ");
-					b.append(Utils.routeStripTrailing(s.routeName));
-					routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
-				}
+			if(stops.size() > 0) {
+				if(Manager.isWMATA()) b.append("Route: ");
+				else b.append("Routes Served: ");
 			}
+			else Log.d(activityNameTag, "Couldn't get routes served for SimpleStop with intersection \"" + arr.get(position).intersection + "\"");
+			if(Manager.isWMATA()) b.append(arr.get(position).routeName);
+			else {
+				for (SimpleStop s : stops) {
+					//The below code makes sure to avoid duplicate listings in "Routes Served: <routes>"
+					if(!routeNamesAlreadyListed.contains(Utils.routeStripTrailing(s.routeName))) {
+						//Make sure to only pre-pend a comma to a routeName if it is NOT the first route name in the list
+						if(first_entry) first_entry = false;
+						else b.append(", ");
+						b.append(Utils.routeStripTrailing(s.routeName));
+						routeNamesAlreadyListed.add(Utils.routeStripTrailing(s.routeName));
+					}
+				}
+			}	
 
 			//Append to subtext the predictions for this stop
 			if(arr.get(position).pred == null) arr.get(position).pred = new Prediction(new int[0], true);
@@ -560,8 +586,7 @@ public class RouteDrill extends CustomList {
 	public void onDestroy() {
 		super.onDestroy();
 		
-		//Pop the result stack if we are killing the ARL that was NOT a searched activity
-		WMATATransitDataManager.popCommand();
+		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
 	}
 	
 	/**This method will attempt to refresh the prediction displayed on this RouteDrill screen. */
