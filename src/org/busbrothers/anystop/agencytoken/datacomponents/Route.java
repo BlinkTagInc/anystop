@@ -22,7 +22,7 @@ public class Route implements Comparable<Route> {
 	
 	@Override
 	public boolean equals(Object other) {
-		if(other instanceof Route) return false;
+		if(!(other instanceof Route)) return false;
 		
 		Route otherRoute = (Route) other;
 		if(otherRoute.sName.equals(sName) && 
@@ -40,6 +40,8 @@ public class Route implements Comparable<Route> {
 		//return this.sName.compareTo(another.sName);
 		int retval;
 		
+		if(this.lName == null) return -1;
+		
 		//No reason to expect compareToForRouteName() to fail, but just in case...
 		try {
 			retval = compareToForRouteName(this, another);
@@ -47,6 +49,8 @@ public class Route implements Comparable<Route> {
 		}
 		catch (Exception e) {
 			Log.e("Route", "compareTo() got error for smart sort, reverting to classic sort.");
+			
+			if(another.lName == null) return -1;
 			retval = lName.compareTo(another.lName);
 		}
 		

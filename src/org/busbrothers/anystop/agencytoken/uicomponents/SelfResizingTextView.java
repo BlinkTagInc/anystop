@@ -100,9 +100,9 @@ public class SelfResizingTextView extends TextView {
 			setTextSize(TypedValue.COMPLEX_UNIT_SP, currentFontSizeInDP);
 			invalidate();
 			
-			Log.v(classNameTag, "Reduced font size to " + currentFontSizeInDP + ", height is " + getHeight());
+			//Log.v(classNameTag, "Reduced font size to " + currentFontSizeInDP + ", height is " + getHeight());
 		}
-		else Log.v(classNameTag, "Did not Reduce font size, " + (getLineCount()*currentFontSizeInDP) + " <= " + maxWindowHeight);
+		//else Log.v(classNameTag, "Did not Reduce font size, " + (getLineCount()*currentFontSizeInDP) + " <= " + maxWindowHeight);
 	}
 	
 	/** This method is called when this View gets its size changed. It checks its own window height and reduces the font size until it

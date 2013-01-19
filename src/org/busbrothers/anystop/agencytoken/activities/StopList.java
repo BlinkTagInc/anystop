@@ -337,7 +337,7 @@ public class StopList extends CustomList {
 			boolean isReal = false;
 			//WMATA already have the correct route names and routes served encoded in routeName (as a comma-delimited list)
 			if(Manager.isWMATA()) {
-				b.append(stopMap.get(arr.get(position)).routeName);
+				b.append(stopMap.get(arr.get(position)).routeName.replace("r_", ""));
 				isReal=true;
 			} else {
 				ArrayList<SimpleStop> stops = Manager.stopMap.get(arr.get(position));
@@ -494,7 +494,7 @@ public class StopList extends CustomList {
 		};
 	};
 	
-	//Used to fetch data fro the esrver
+	//Used to fetch data from the server
 	class DataThread extends Thread {
 		public DataThread() {
 

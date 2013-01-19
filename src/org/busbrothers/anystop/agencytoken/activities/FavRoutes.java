@@ -329,7 +329,7 @@ public class FavRoutes extends CustomList {
 
 			if(Manager.isWMATA()) {
 				String routeName = arr.get(position);
-				routeName.replace("r_", "");
+				routeName = routeName.replace("r_", "");
 				label.setText(Utils.capFirst(routeName.trim()));
 			} else
 				label.setText(Utils.capFirst(arr.get(position).trim()));

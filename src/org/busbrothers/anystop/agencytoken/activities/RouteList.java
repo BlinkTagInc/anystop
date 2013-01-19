@@ -65,6 +65,7 @@ public class RouteList extends CustomList {
 
 	// TextView selection;
 	ArrayList<String> arr;
+	HashMap<Route, ArrayList<SimpleStop>> routeMap;
 	
 	IconicAdapter theListAdapter;
 	
@@ -96,7 +97,8 @@ public class RouteList extends CustomList {
 		List<String> tempArr;
 		
 		if(Manager.isWMATA()) {
-			Set<Route> routes = ((HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData()).keySet();
+			routeMap = (HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
+			Set<Route> routes = routeMap.keySet();
 			
 			tempArr = new ArrayList<String>();
 			for(Route r : routes) tempArr.add(r.lName);
@@ -278,9 +280,7 @@ public class RouteList extends CustomList {
 			StringBuilder b = new StringBuilder("Nearest Stops:");
 			ArrayList<SimpleStop> stops = null;
 			
-			if(Manager.isWMATA() ) {
-				HashMap<Route, ArrayList<SimpleStop>> routeMap = (HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
-				
+			if(Manager.isWMATA() ) {				
 				for(Route r : routeMap.keySet())
 					if(r.lName.equals(arr.get(position))) stops=routeMap.get(r);
 				
@@ -356,7 +356,7 @@ public class RouteList extends CustomList {
 			
 			if(Manager.isWMATA()) {
 				String routeName = arr.get(position);
-				routeName.replace("r_", "");
+				routeName = routeName.replace("r_", "");
 				label.setText(Utils.capFirst(routeName.trim()));
 			} else
 				label.setText(Utils.capFirst(arr.get(position).trim()));
@@ -419,8 +419,6 @@ public class RouteList extends CustomList {
 			Manager.clearStops();
 			try {
 				if(Manager.isWMATA()) {
-					HashMap<Route, ArrayList<SimpleStop>> routeMap = (HashMap<Route, ArrayList<SimpleStop>>)WMATATransitDataManager.peekLastData();
-					
 					boolean found_one = false;
 					
 					for(Route r : routeMap.keySet()) {
@@ -429,6 +427,8 @@ public class RouteList extends CustomList {
 							
 							ArrayList<SimpleStop> stops=routeMap.get(r);
 							WMATATransitDataManager.fetchPredictionsByStops(stops);
+							
+							break;
 						}
 					}
 				} else Manager.repeat();

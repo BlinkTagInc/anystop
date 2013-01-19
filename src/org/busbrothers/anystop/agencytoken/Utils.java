@@ -103,8 +103,8 @@ public class Utils {
 		ArrayList<Route> toTheTop = new ArrayList<Route>();
 		
 		for(int i = routes.size()-1; i >= 0; i--) {
-			if(routes.get(i).lName.startsWith("r_")) {
-				toTheTop.add(i, routes.get(i));
+			if(routes.get(i).lName != null && routes.get(i).lName.startsWith("r_")) {
+				toTheTop.add(0, routes.get(i));
 				routes.remove(i);
 			}
 		}
@@ -121,7 +121,7 @@ public class Utils {
 		
 		for(int i = routes.size()-1; i >= 0; i--) {
 			if(routes.get(i).startsWith("r_")) {
-				toTheTop.add(i, routes.get(i));
+				toTheTop.add(0, routes.get(i));
 				routes.remove(i);
 			}
 		}

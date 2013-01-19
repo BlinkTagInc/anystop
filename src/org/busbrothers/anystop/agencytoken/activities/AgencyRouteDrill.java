@@ -121,7 +121,8 @@ public class AgencyRouteDrill extends CustomList {
 		
 		SelfResizingTextView title = (SelfResizingTextView) findViewById(R.id.title);
 		title.setResizeParams(Manager.LISTWINDOW_START_FONTSIZE, Manager.LISTWINDOW_MIN_FONTSIZE, Manager.LISTWINDOW_MAX_NUMLINES, Manager.LISTWINDOW_MAX_HEIGHT);
-		title.setText("Route " + Manager.stringTracker);
+		if (Manager.isWMATA()) title.setText("Route " + Manager.stringTracker.replace("r_", ""));
+		else title.setText("Route " + Manager.stringTracker);
 		//Set subtitle "hint" also
 		String subtitleHint;
 		subtitleHint = (String) getString(R.string.AgencyRouteDrill_SubtitleHint);

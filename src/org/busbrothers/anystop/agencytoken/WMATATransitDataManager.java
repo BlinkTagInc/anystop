@@ -1,3 +1,14 @@
+/** This class is used to perform calls to fetch transit data and predictions for WMATA rail and bus 
+ * routes. It calls static methods in WMATATransitDataFetcher to get this data, and stores the results
+ * (and a stack of the queries that have been performed). Storing state allows us to re-do previous
+ * queries to for example refresh data that we have fetched.
+ * 
+ * The comments in this class are pretty spare, looking in the TransitDataFetcher class may be
+ * more informative.
+ * 
+ * Written I. Yulaev 2013-01-(01-18)
+ */
+
 package org.busbrothers.anystop.agencytoken;
 
 import java.util.ArrayList;
@@ -24,6 +35,9 @@ public class WMATATransitDataManager {
 	
 	private static final String activitynametag = "WMATATransitDataManager";
 	
+	/** Reset all command state and data that we have fetched. Also clear the TransitDataFetcher
+	 * cache.
+	 */
 	public static void reset() {
 		lastCommandStack = new ArrayList<Integer>();
 		lastFetchStack = new ArrayList<Object>();
@@ -32,6 +46,7 @@ public class WMATATransitDataManager {
 		WMATATransitDataFetcher.reset();
 	}
 	
+	/** Fetch a list of Routes for the agency */
 	public static void fetchAgencyRouteList() throws ServerBarfException {
 		try {
 			ArrayList<Route> routeList = WMATATransitDataFetcher.fetchAgencyRouteList();
@@ -51,6 +66,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Fetch a list of stops for a given Route */
 	public static void fetchStopsByRoute(Route r) throws ServerBarfException {
 		if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_ROUTES) {
 			Log.d(activitynametag, "Error for fetchStopsByRoute() - did not detect that last command fetched a route!");
@@ -72,8 +88,8 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Get some predictions for a given SimpleStop */
 	public static void fetchPredictionsByStop(SimpleStop s) throws ServerBarfException {
-		//TODO: Maybe the conditions here will have to change...
 		//This isn't the right condition to check anyway since we can be fetching a stop from FavStops that was saved ages ago
 		/*if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_STOPS_BY_ROUTE) {
 			Log.d("Error for fetchPredictionsByStop() - did not detect that last command fetched a route!");
@@ -95,6 +111,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Get some predictions for a given ArrayList SimpleStop */
 	public static void fetchPredictionsByStops(ArrayList<SimpleStop> stops) throws ServerBarfException {
 		try {
 			ArrayList<SimpleStop> predStopsList = WMATATransitDataFetcher.fetchPredictionsByStops(stops);
@@ -111,6 +128,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Given a Location for the requestor, fetch some nearby Routes */
 	public static void fetchRoutesByLocation(Location loc) throws ServerBarfException {
 		try {
 			HashMap<Route, ArrayList<SimpleStop>> nearestRouteMap = 
@@ -129,6 +147,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Given a Location for the requestor, fetch some nearby Stops */
 	public static void fetchStopsByLocation(Location loc) throws ServerBarfException {
 		try {
 			ArrayList<SimpleStop> nearestStops = 
@@ -147,6 +166,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Re-do the last query; this is used to "refresh" the data fetched for the previous query */
 	public static void repeat() throws ServerBarfException {
 		if(lastCommandStack.size() == 0 || lastFetchStack.size() == 0) {
 			Log.w(activitynametag, "Error doing repeat - last command was null!");
@@ -196,6 +216,7 @@ public class WMATATransitDataManager {
 		}
 	}
 	
+	/** Remove a command, the query data, and the result from our command stacks */
 	public static void popCommand() {
 		if(lastCommandStack.size() > 0)
 			lastCommandStack.remove(lastCommandStack.size()-1);
@@ -205,6 +226,11 @@ public class WMATATransitDataManager {
 			lastResultStack.remove(lastResultStack.size()-1);
 	}
 	
+	/** Peek at the last data that we fetched. Lots of classes use this method to actually access the 
+	 * data that the WMATATransitDataManager fetches. You'll have to know what command was done to cast
+	 * the result though.
+	 * @return An Object representing the last data that the WMATA TDM fetched.
+	 */
 	public static Object peekLastData() {
 		if(lastResultStack.size() > 0)
 			return(lastResultStack.get(lastFetchStack.size()-1));

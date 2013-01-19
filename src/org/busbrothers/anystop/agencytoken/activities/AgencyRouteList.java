@@ -98,6 +98,10 @@ public class AgencyRouteList extends CustomList {
 		if(Manager.isWMATA()) arr = (ArrayList<Route>) WMATATransitDataManager.peekLastData();
 		else arr = Manager.agencyRoutes;
 		
+		for ( Route r : arr ) {
+			Log.d("AgencyRouteList", "Got route: (" + r.sName + ", " + r.lName + ")");
+		}
+		
 		if (arr==null) {
 			this.setResult(-1);
 			this.finish();
@@ -225,7 +229,11 @@ public class AgencyRouteList extends CustomList {
 					else passFilter = passFilter && currRoute.sName.toLowerCase().contains(currQuery.toLowerCase());
 				}
 				
-				if(!passFilter) positionsToFilter.add(currRoute);
+				if(!passFilter) {
+					Log.d("AgencyRouteList", "Route " + currRoute.lName + " didn't pass filter");
+					positionsToFilter.add(currRoute);
+				} else
+					Log.d("AgencyRouteList", "Route " + currRoute.lName + " passed filter");
 			}
 			
 			//Remove all positions that we should filter
@@ -332,7 +340,7 @@ public class AgencyRouteList extends CustomList {
 			
 			if(Manager.isWMATA()) {
 				String routeName = arr.get(position).lName;
-				routeName.replace("r_", "");
+				routeName = routeName.replace("r_", "");
 				label.setText(Utils.capFirst(routeName.trim()));
 			} else
 				label.setText(Utils.capFirst(arr.get(position).lName.trim()));

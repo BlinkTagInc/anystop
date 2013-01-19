@@ -207,7 +207,10 @@ public class RouteDrill extends CustomList {
 		//Otherwise set the title to reflect the route being displayed in this Activity
 		this.title = (SelfResizingTextView) findViewById(R.id.title);
 		if(arr.size() > 0 && callingActivity.equals("AgencyRouteDrill")) title.setText("Predictions for " + arr.get(0).intersection);
-		else title.setText("Predictions for Route " + Manager.stringTracker);
+		else {
+			if(Manager.isWMATA()) title.setText("Predictions for Route " + Manager.stringTracker.replace("r_", ""));
+			else title.setText("Predictions for Route " + Manager.stringTracker);
+		}
 		
 		title.setResizeParams(Manager.LISTWINDOW_START_FONTSIZE, Manager.LISTWINDOW_MIN_FONTSIZE, Manager.LISTWINDOW_MAX_NUMLINES, Manager.LISTWINDOW_MAX_HEIGHT);
 		
