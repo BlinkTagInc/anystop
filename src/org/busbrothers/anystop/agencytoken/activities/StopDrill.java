@@ -115,7 +115,7 @@ public class StopDrill extends CustomList {
 				//}
 			}
 			
-			arr = filterDuplicatesByIntersectionName(arr);
+			//arr = filterDuplicatesByIntersectionName(arr);
 			Collections.sort(arr);
 			i = new IconicAdapter(this);
 			setListAdapter(i);
@@ -365,7 +365,8 @@ public class StopDrill extends CustomList {
 				sched.setText("Scheduled Arrivals:");
 				sched.setTextColor(0xFFE0B000);
 			} 
-			label.setText(stop.routeName);
+			if(Manager.isWMATA()) label.setText(stop.routeName.replace("r_", ""));
+			else label.setText(stop.routeName);
 			content.setText(b.toString());
 			ImageView icon=(ImageView)row.findViewById(R.id.icon);
 			icon.setImageResource(R.drawable.rail);
@@ -436,14 +437,22 @@ public class StopDrill extends CustomList {
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
-			 	if(Manager.isWMATA()) arr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();	
+			 	if(Manager.isWMATA()) {
+			 		ArrayList<SimpleStop> tempArr;
+			 		try {
+			 			tempArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+			 			arr = tempArr;
+			 		} catch (ClassCastException e) {
+			 			; //do nothing
+			 		}
+			 	}
 			 	else arr = Manager.stopMap.get(Manager.stringTracker);
 			 	
 				if (arr==null) {
 					me.setResult(-1);
 					me.finish();
 				}else {
-					arr = filterDuplicatesByIntersectionName(arr);
+					//arr = filterDuplicatesByIntersectionName(arr);
 					Collections.sort(arr);
 					i.notifyDataSetChanged();
 					me.setResult(0);

@@ -64,7 +64,9 @@ public class RouteDrill extends CustomList {
 	
 	//TextView selection;
 	List<SimpleStop> tempArr; //!<The List of SimpleStop objects (representing transit stops) that will be displayed in this RouteDrill.
+	ArrayList<SimpleStop> fetchedArr; //the last known good array that we fetch
 	ArrayList<SimpleStop> arr;
+	String routeSelected = null; //gets filled if RouteList launches us for WMATA
 	
 	int nearest_stop_index; //!<The SimpleStop with this index in arr will be the nearest stop to the user's current location
 	Button mapButton, refresh;
@@ -113,19 +115,10 @@ public class RouteDrill extends CustomList {
 		isASearchedActivity = false;
 		
 		if(Manager.isWMATA()) {
+			if(extras.getString("Route")!=null) routeSelected = extras.getString("Route");
+			
 			ArrayList<SimpleStop> fetchedArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
-			tempArr = new ArrayList<SimpleStop>();
-			
-			ArrayList<String> intersectionsAlreadySeen = new ArrayList<String>();
-			
-			//Filter stops with identical intersections
-			for(SimpleStop s : fetchedArr) {
-				//if(!intersectionsAlreadySeen.contains(s.intersection)) {
-				if(true) {
-					tempArr.add(s);
-					intersectionsAlreadySeen.add(s.intersection);
-				}
-			}
+			tempArr = filterFetchedByRouteName(fetchedArr);
 		}
 		
 		else tempArr = Manager.routeMap.get(Manager.stringTracker);
@@ -221,6 +214,23 @@ public class RouteDrill extends CustomList {
 	    autoRefreshRunnableTaskHandler.postDelayed(autoRefreshRunnableTask, refresh_period_in_seconds * 1000);
 	    
     	super.onCreate(icicle);
+	}
+	
+	private ArrayList<SimpleStop> filterFetchedByRouteName(ArrayList<SimpleStop> fetchedStopsLocal) {
+		ArrayList<SimpleStop> retval = new ArrayList<SimpleStop>();
+		
+		ArrayList<String> intersectionsAlreadySeen = new ArrayList<String>();
+		
+		//Filter stops with identical intersections
+		for(SimpleStop s : fetchedStopsLocal) {
+			//if(!intersectionsAlreadySeen.contains(s.intersection)) {
+			if(routeSelected == null || s.routeName.contains(routeSelected)) {
+				retval.add(s);
+				intersectionsAlreadySeen.add(s.intersection);
+			}
+		}
+		
+		return retval;
 	}
 	
 	/** This method gets called if this activity is at the top of the stack and its launch mode is set to singleTop in the App manifest.
@@ -404,8 +414,18 @@ public class RouteDrill extends CustomList {
 			
 			ArrayList<SimpleStop> stops;
 			
-			//TODO: classcastexception right here???
-			if(Manager.isWMATA()) stops = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+			if(Manager.isWMATA()) {
+				//Sometimes we get a class cast exception (when RouteDrill misbehaves and tries to peek when it shouldn't)
+				//we should handle this gracefully and simply not change the dataset
+				try {
+					stops = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+					fetchedArr = stops;
+					stops = filterFetchedByRouteName(stops);
+					arr = stops;
+				} catch (ClassCastException e) {
+					stops = arr;
+				}
+			}
 			else stops = Manager.stopMap.get(arr.get(position).intersection);
 			
 			HashSet<String> routeNamesAlreadyListed = new HashSet<String>();
@@ -415,7 +435,7 @@ public class RouteDrill extends CustomList {
 				else b.append("Routes Served: ");
 			}
 			else Log.d(activityNameTag, "Couldn't get routes served for SimpleStop with intersection \"" + arr.get(position).intersection + "\"");
-			if(Manager.isWMATA()) b.append(arr.get(position).routeName);
+			if(Manager.isWMATA()) b.append(arr.get(position).routeName.replace("r_", ""));
 			else {
 				for (SimpleStop s : stops) {
 					//The below code makes sure to avoid duplicate listings in "Routes Served: <routes>"
@@ -552,7 +572,14 @@ public class RouteDrill extends CustomList {
 	 private Handler stact = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
-				if(Manager.isWMATA()) arr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData();
+				if(Manager.isWMATA()) {
+					try { 
+						ArrayList<SimpleStop> tempArr;
+						tempArr = (ArrayList<SimpleStop>) WMATATransitDataManager.peekLastData(); 
+						arr = tempArr;
+					}
+					catch (ClassCastException e) { ; }
+				}
 				else arr = Manager.routeMap.get(Manager.stringTracker);
 				
 				if (arr==null) {
@@ -590,6 +617,8 @@ public class RouteDrill extends CustomList {
 		super.onDestroy();
 		
 		if(Manager.isWMATA()) WMATATransitDataManager.popCommand();
+		autoRefreshRunnableTaskHandler.removeCallbacks(autoRefreshRunnableTask);
+		
 	}
 	
 	/**This method will attempt to refresh the prediction displayed on this RouteDrill screen. */

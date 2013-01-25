@@ -1198,10 +1198,16 @@ public class Manager {
 		return(_settingURL);
 	}
 	
+	/** Here we list the special cases in which a REAL-TIME app should NOT use the NextBus APIK
+	 * This is usually when we provide alternative real-time data for the agency
+	 * When override is set to "true" for an agency we will use the BusBrothers ads APIK for that agency
+	 * @return A HashMap containing override info for agencies
+	 */
 	public static HashMap<String, Boolean> getOverrides() {
 		HashMap<String, Boolean> h = new HashMap<String, Boolean>();
 		h.put("muni", true);
 		h.put("portland", true);
+		h.put("wmatawashington", true);
 		return h;
 	}
 	
@@ -1334,8 +1340,9 @@ public class Manager {
 	/** This method tells us what type of ad to use.
 	 * @return Type of advertisement to use (ADDIENCE_AD, ADMOB_AD, ...)
 	 */
-	public static int adTypeUsing() {		
-		if(isScheduleApp()) {
+	public static int adTypeUsing() {
+		if(isScheduleApp() || 
+				(getOverrides().containsKey(Manager.getAgencyTag()) && getOverrides().get(Manager.getAgencyTag())) ) {
 			if(GlobalSettings.getSetting("adsForScheduleApps") != null && 
 					GlobalSettings.getSetting("adsForScheduleApps").equals("admob")) {
 				Log.v(activityNameTag, "Using admob ads!");
@@ -1345,6 +1352,7 @@ public class Manager {
 				return ADDIENCE_AD;
 			}
 		}
+		//Real time apps that aren't overridden always use admob ads
 		else {
 			Log.v(activityNameTag, "Using admob ads!");
 			return ADMOB_AD;

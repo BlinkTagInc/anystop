@@ -110,21 +110,15 @@ public class StopsTime extends Activity{
     	//Set up Admob APIK and keywords; also set up AdWhirl stuff but as of 2011-12-04 it's not being used yet
     	String adsapik = getString(R.string.BBadmobAPIK);
     	String adwhirlAPIK = getString(R.string.BBadwhirlAPIK);
+    	
+    	//If the agency is real time, AND overrides does not return true for the agency...
     	HashMap<String, Boolean> overrides = Manager.getOverrides();
-    	if (!Manager.get_predictionType().equalsIgnoreCase("schedule")) {
+    	if (!Manager.get_predictionType().equalsIgnoreCase("schedule") && !(( overrides.containsKey(Manager.getAgencyTag()) && overrides.get(Manager.getAgencyTag()) ))) {
     		adsapik = getString(R.string.NBISadmobAPIK);
-    		adwhirlAPIK = getString(R.string.NBISadwhirlAPIK);
-    	}
-    	Boolean b = overrides.get(Manager.getAgencyTag());
-    	if (b!=null) {
-    		if (!b.booleanValue()) {
-    			adsapik = getString(R.string.NBISadmobAPIK);
-    			adwhirlAPIK = getString(R.string.NBISadwhirlAPIK);
-    		} else {
-    			adsapik = getString(R.string.BBadmobAPIK);
-    			adwhirlAPIK = getString(R.string.BBadwhirlAPIK);
-    		}
-    	}
+			adwhirlAPIK = getString(R.string.NBISadwhirlAPIK);
+		//Otherwise, either it's schedule based, or overrides returned true (or both!)
+    	} 
+    	
     	Manager.setAdsAPIK(adsapik);
     	Manager.setAdWhirlAPIK(adwhirlAPIK);
     	//AdManager.setPublisherId(Manager.getAdsAPIK()); //removed for Admob SDK upgrade; this gets done on individual AdView init now
@@ -138,6 +132,7 @@ public class StopsTime extends Activity{
     	//Remove or comment the below also
     	//Log.i(activityNameTag, "Using flurry APIK: " + Manager.getFlurryAPIK());
     	//Log.i(activityNameTag, "Using ads APIK: " + Manager.getAdsAPIK());
+    	//Log.i(activityNameTag, "Using ads type: " + Manager.adTypeUsing());
     	//String maps_apik = getString(R.string.maps_apik);
     	//Log.i(activityNameTag, "Using google maps APIK: " + maps_apik);
     	

@@ -589,6 +589,8 @@ public class WMATATransitDataFetcher {
 			url = WMATA_BUS_STOPS_URL 
 					+ "?routeId=" + r.sName
 					+ "&api_key=" + WMATA_APIKEY;
+			
+			Log.d(activitynametag, "Getting stops using URL=" + url);
 	
 			jsonText = APIEndpointAccessUtils.jsonStringFromURLString(url);		
 			jsonResult = null;
@@ -633,10 +635,11 @@ public class WMATATransitDataFetcher {
 		}
 		
 		url = WMATA_BUS_PREDICTIONS_URL 
-				+ "?" + s.stopcode
+				+ "?StopID=" + s.stopcode
 				+ "&api_key=" + WMATA_APIKEY;
 		
 		jsonText = APIEndpointAccessUtils.jsonStringFromURLString(url);
+		Log.d(activitynametag, "Getting bus predictions using URL=" + url);
 		
 		try {
 			jsonResult = new JSONObject( jsonText ); 

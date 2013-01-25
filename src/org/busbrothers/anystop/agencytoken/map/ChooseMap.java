@@ -253,7 +253,10 @@ public class ChooseMap extends MapActivity {
 		first = false;
 		
 		//Report opening of StopsTime to Flurry Analytics
-		FlurryAgent.onStartSession(this, Manager.getFlurryAPIK());
+		//For some reason it'll crash with "no API key specified". Not sure how to continue from this.
+		try {
+			FlurryAgent.onStartSession(this, Manager.getFlurryAPIK());
+		} catch(IllegalArgumentException e) { ; } 
 		if(! flurryEventLogged) {
 			Manager.flurryActivityOpenEvent(activityNameTag);
 			flurryEventLogged = true;

@@ -66,6 +66,8 @@ public class RouteList extends CustomList {
 	// TextView selection;
 	ArrayList<String> arr;
 	HashMap<Route, ArrayList<SimpleStop>> routeMap;
+	//Used for WMATA only to track what Route was selected
+	String routeClicked;
 	
 	IconicAdapter theListAdapter;
 	
@@ -233,6 +235,7 @@ public class RouteList extends CustomList {
 		Manager.flurryRouteSelectEvent(arr.get(position));
 		
 		if(Manager.isWMATA() ) {
+			routeClicked = arr.get(position);
 			handler.sendEmptyMessage(0);
 		}
 		
@@ -448,6 +451,7 @@ public class RouteList extends CustomList {
 		 public void handleMessage(Message msg) {
 			 Intent i = new Intent(me, RouteDrill.class);
 			 i.putExtra("CallingActivity", activityNameTag);
+			 i.putExtra("Route", routeClicked);
 			 startActivityForResult(i,0);
 		 }
 			
