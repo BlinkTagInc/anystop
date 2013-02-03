@@ -1397,19 +1397,14 @@ public class Manager {
 			//If v is a ViewGroup, call applyFonts on all of its children
 			if (v instanceof ViewGroup) {
 				ViewGroup vg = (ViewGroup) v;
-				Log.v("Manager", "Calling applyFonts recursively on ViewGroup " + vg);
 				for (int i = 0; i < vg.getChildCount(); i++) applyFonts(vg.getChildAt(i));
 			//Otherwise if v is a TextView set its Typeface
 			} else if (v instanceof TextView) {
 				((TextView)v).setTypeface(defaultTypeface);
-				Log.v("Manager", "Applying TypeFace to View: " + v);
 			}
 			//Otherwise do nothing
-			else {
-				Log.v("Manager", "View " + v + " was neither TextView nor ViewGroup; no font was applied.");
-			}
 		} catch (Exception e) {
-			Log.d("Manager", "Skipping application of TypeFace to View: " + v);
+			Log.d("Manager", "Exception while applying TypeFace - skipping application of TypeFace to View: " + v);
 		}
 	}
 	

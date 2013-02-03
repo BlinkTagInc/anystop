@@ -283,6 +283,7 @@ public class WMATATransitDataFetcher {
 					
 					for(int i = 1; i < stopsWSameName.size(); i++) {
 						first.headSign += ", " + stopsWSameName.get(i).headSign;
+						first.stopcode += ";" + stopsWSameName.get(i).stopcode;
 					}
 					
 					returned.add(first);
@@ -395,6 +396,8 @@ public class WMATATransitDataFetcher {
 		
 		return(returned);
 	}
+	
+	
 	
 	/** Return an ArrayList of SimpleStops, with associated Prediction datum for each, given a SimpleStop 
 	 * which we have fetched predictions for and a predictionArray storing the JSON return from the WMATA
@@ -616,6 +619,12 @@ public class WMATATransitDataFetcher {
 	 * return multiple SimpleStop objects, since we have no better way of expressing the multiple
 	 * route and headsign combinations that Predictions will probably return */
 	public static ArrayList<SimpleStop> fetchPredictionsByStop(SimpleStop s) {
+		//If the stopcode field contains the ";" character, this means that it is in fact several
+		//stopcodes mashed together. We should return the prediction results for all of these stopcodes
+		if(s.stopcode.contains(";")) {
+			return(fetchPredictionsByStops(splitStop(s)));
+		}
+		
 		String url = WMATA_RAIL_PREDICTIONS_URL 
 				+ s.stopcode
 				+ "?api_key=" + WMATA_APIKEY;
@@ -960,5 +969,36 @@ public class WMATATransitDataFetcher {
 			
 			System.out.println("}");
 		}
+	}
+	
+	/** Used to split up a SimpleStop having multiple, ';' delimited stop codes, into an
+	 * ArrayList of SimpleStops */
+	private static ArrayList<SimpleStop> splitStop(SimpleStop s) {
+		String [] stopCodes = s.stopcode.split(";");
+		ArrayList<SimpleStop> returned = new ArrayList<SimpleStop>(stopCodes.length);
+		
+		for(String new_stopcode : stopCodes) {
+			SimpleStop newSimpleStop = new SimpleStop();
+			
+			//Clone the stop except use a single stop code
+			newSimpleStop.agency = s.agency;
+			newSimpleStop.routeName = s.routeName;
+			newSimpleStop.dirName = s.dirName;
+			newSimpleStop.headSign = s.headSign;
+			newSimpleStop.intersection = s.intersection;
+			newSimpleStop.diruse = s.diruse;
+			newSimpleStop.direction = s.direction;
+			newSimpleStop.table = s.table;
+			newSimpleStop.isRTstr = s.isRTstr;
+			newSimpleStop.pred = s.pred;
+			newSimpleStop.lat = s.lat;
+			newSimpleStop.lon = s.lon;
+			
+			newSimpleStop.stopcode = new_stopcode;
+			
+			returned.add(newSimpleStop);
+		}
+		
+		return(returned);
 	}
 }
