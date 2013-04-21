@@ -98,14 +98,15 @@ public class AgencyRouteList extends CustomList {
 		if(Manager.isWMATA()) arr = (ArrayList<Route>) WMATATransitDataManager.peekLastData();
 		else arr = Manager.agencyRoutes;
 		
-		for ( Route r : arr ) {
-			Log.d("AgencyRouteList", "Got route: (" + r.sName + ", " + r.lName + ")");
+		if(arr.size() == 0) {
+			Toast t = Toast.makeText(me, "Error contacting the server - please let us know. Email info@anystopapp.com", Toast.LENGTH_LONG);
+			t.show();
 		}
 		
 		if (arr==null) {
 			this.setResult(-1);
 			this.finish();
-		}else {
+		} else {
 			Log.d(activityNameTag, "AgencyRouteList has started sorting; arr has " + arr.size() + "members...");
 			long startSortTime = System.currentTimeMillis();
 			Collections.sort(arr);

@@ -123,6 +123,11 @@ public class StopList extends CustomList {
 			arr = new ArrayList<String>();
 			for(String str : tempArr) arr.add(str);	
 			
+			if(arr.size() == 0) {
+				Toast t = Toast.makeText(me, "Error contacting the server - please let us know. Email info@anystopapp.com", Toast.LENGTH_LONG);
+				t.show();
+			}
+			
 			if(!Manager.isWMATA()) {
 				Collections.sort(arr);
 				

@@ -472,7 +472,7 @@ public class RouteDrill extends CustomList {
 						
 						//Hax for TheBUS since TheBUS sometimes has real-time predictions for the next arrival
 						if(arr.get(position).pred.isRT && Manager.getAgencyTag().equals("thebus") && first_stop) {
-							absTime.setText(predictionTime[1] + "( real-time)");
+							absTime.setText(predictionTime[1] + " (real-time)");
 							absTime.setTextColor(0xFF009900);
 							deltaTime.setTextColor(0xFF009900);
 							

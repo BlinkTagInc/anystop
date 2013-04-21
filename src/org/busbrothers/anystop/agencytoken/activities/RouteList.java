@@ -119,6 +119,11 @@ public class RouteList extends CustomList {
 			Iterator<String> tempArrIterator = tempArr.iterator();
 			while(tempArrIterator.hasNext()) arr.add(tempArrIterator.next());
 			
+			if(arr.size() == 0) {
+				Toast t = Toast.makeText(me, "Error contacting the server - please let us know. Email info@anystopapp.com", Toast.LENGTH_LONG);
+				t.show();
+			}
+			
 			Collections.sort(arr);
 			Utils.sortRoutesBySpecialString(arr);
 			

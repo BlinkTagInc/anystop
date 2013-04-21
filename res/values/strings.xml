@@ -13,7 +13,7 @@
     
     <!-- Admob APIKs for BusBrothers and BB/Nextbus-shared apprs -->
     <string name="BBadmobAPIK">a14b02469f7bc59</string>
-    <string name="NBISadmobAPIK">a14b2fc34b5bc1d</string>
+    <string name="NBISadmobAPIK">a14b02469f7bc59</string>
     <string name="BBaddienceAPIK">5ae16ba2850e6197e539148080574a25</string>
     <!-- Below are APIKs for AdWhirl; these are Ivan's personal APIKs for testing ONLY -->
     <string name="BBadwhirlAPIK">8732a7ca288f4d40b82dac36385cb4f9</string>
@@ -28,6 +28,24 @@
     <!-- <string name="defaultTypeface">fonts/mplus-1c-light.ttf</string> -->
     
     <!-- Agency settings -->
+    
+    <!-- <string name="agencyName">AC_Transit</string>
+    <string name="agencyTable">AC_Transit</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">actransit</string>
+    <string name="agencyLong">AC Transit</string>
+    <string name="agencyShort">AC Transit</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">Portland_Streetcar</string>
+    <string name="agencyTable">Portland_Streetcar</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">portlandstreetcar</string>
+    <string name="agencyLong">Portland Streetcar</string>
+    <string name="agencyShort">Portland Streetcar</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
     <!--<string name="agencyName">milwaukee_county_transit_system</string>
     <string name="agencyTable">milwaukee_county_transit_system</string>
@@ -54,8 +72,8 @@
     <string name="agencyLong">WMATA Washington</string>
     <string name="agencyShort">DC WMATA</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string> 
-    
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+      
     <!-- <string name="agencyName">pace-suburban-bus-service</string>
     <string name="agencyTable">pace_suburban_bus_service</string>
     <string name="agencyPredictionType">schedule</string>
@@ -108,12 +126,14 @@
     <string name="agencyLong">Elon University</string>
     <string name="agencyShort">Elon University</string>-->
     
-    <!--  <string name="agencyName">badhill</string>
-    <string name="agencyTable">badhill</string>
-    <string name="agencyPredictionType">real</string>
+    <!-- <string name="agencyName">badhill</string>
+    <string name="agencyTable">kingcounty_archiver</string>
+    <string name="agencyPredictionType">schedule</string>
     <string name="agencyTag">badhill</string>
     <string name="agencyLong">King County Metro Transit</string>
-    <string name="agencyShort">King County</string> -->
+    <string name="agencyShort">King County</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
     <!-- <string name="agencyName">caltrain</string>
     <string name="agencyTable">caltrain</string>
@@ -165,6 +185,15 @@
     <string name="agencyTag">trimet</string>
     <string name="agencyLong">Portland Trimet</string>
     <string name="agencyShort">TriMet</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">Fairfax__CUE_</string>
+    <string name="agencyTable">Fairfax__CUE_</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">fairfaxcue</string>
+    <string name="agencyLong">Fairfax CUE</string>
+    <string name="agencyShort">Fairfax CUE</string>
     <string name="agencyScheduleTable">na</string>
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     

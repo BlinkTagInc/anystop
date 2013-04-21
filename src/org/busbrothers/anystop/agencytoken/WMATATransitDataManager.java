@@ -22,6 +22,7 @@ import android.location.Location;
 import android.util.Log;
 
 public class WMATATransitDataManager {
+	private static boolean has_been_reset = false;
 	private static ArrayList<Integer> lastCommandStack;
 	private static ArrayList<Object> lastFetchStack; //Store objects we use TO get results from WMATA server
 	private static ArrayList<Object> lastResultStack; //Store results we get from the WMATA server
@@ -42,12 +43,15 @@ public class WMATATransitDataManager {
 		lastCommandStack = new ArrayList<Integer>();
 		lastFetchStack = new ArrayList<Object>();
 		lastResultStack =new ArrayList<Object>(); 
+		has_been_reset = true;
 		
 		WMATATransitDataFetcher.reset();
 	}
 	
 	/** Fetch a list of Routes for the agency */
 	public static void fetchAgencyRouteList() throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		try {
 			ArrayList<Route> routeList = WMATATransitDataFetcher.fetchAgencyRouteList();
 			
@@ -68,6 +72,8 @@ public class WMATATransitDataManager {
 	
 	/** Fetch a list of stops for a given Route */
 	public static void fetchStopsByRoute(Route r) throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_ROUTES) {
 			Log.d(activitynametag, "Error for fetchStopsByRoute() - did not detect that last command fetched a route!");
 			throw new ServerBarfException();
@@ -90,6 +96,8 @@ public class WMATATransitDataManager {
 	
 	/** Get some predictions for a given SimpleStop */
 	public static void fetchPredictionsByStop(SimpleStop s) throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		//This isn't the right condition to check anyway since we can be fetching a stop from FavStops that was saved ages ago
 		/*if(lastCommandStack.get(lastCommandStack.size()-1) != COMMAND_FETCH_STOPS_BY_ROUTE) {
 			Log.d("Error for fetchPredictionsByStop() - did not detect that last command fetched a route!");
@@ -113,6 +121,8 @@ public class WMATATransitDataManager {
 	
 	/** Get some predictions for a given ArrayList SimpleStop */
 	public static void fetchPredictionsByStops(ArrayList<SimpleStop> stops) throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		try {
 			ArrayList<SimpleStop> predStopsList = WMATATransitDataFetcher.fetchPredictionsByStops(stops);
 			
@@ -130,6 +140,8 @@ public class WMATATransitDataManager {
 	
 	/** Given a Location for the requestor, fetch some nearby Routes */
 	public static void fetchRoutesByLocation(Location loc) throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		try {
 			HashMap<Route, ArrayList<SimpleStop>> nearestRouteMap = 
 					WMATATransitDataFetcher.getNearestRoutes(loc.getLatitude(), loc.getLongitude());
@@ -149,6 +161,8 @@ public class WMATATransitDataManager {
 	
 	/** Given a Location for the requestor, fetch some nearby Stops */
 	public static void fetchStopsByLocation(Location loc) throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		try {
 			ArrayList<SimpleStop> nearestStops = 
 					WMATATransitDataFetcher.getNearestStops(loc.getLatitude(), loc.getLongitude());
@@ -168,6 +182,8 @@ public class WMATATransitDataManager {
 	
 	/** Re-do the last query; this is used to "refresh" the data fetched for the previous query */
 	public static void repeat() throws ServerBarfException {
+		if(!has_been_reset) return;
+		
 		if(lastCommandStack.size() == 0 || lastFetchStack.size() == 0) {
 			Log.w(activitynametag, "Error doing repeat - last command was null!");
 		}
@@ -218,6 +234,8 @@ public class WMATATransitDataManager {
 	
 	/** Remove a command, the query data, and the result from our command stacks */
 	public static void popCommand() {
+		if(!has_been_reset) return;
+		
 		if(lastCommandStack.size() > 0)
 			lastCommandStack.remove(lastCommandStack.size()-1);
 		if(lastFetchStack.size() > 0)
@@ -232,6 +250,8 @@ public class WMATATransitDataManager {
 	 * @return An Object representing the last data that the WMATA TDM fetched.
 	 */
 	public static Object peekLastData() {
+		if(!has_been_reset) return null;
+		
 		if(lastResultStack.size() > 0)
 			return(lastResultStack.get(lastFetchStack.size()-1));
 		else return null;

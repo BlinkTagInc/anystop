@@ -516,6 +516,8 @@ public class Manager {
     	 * also a schedule-based table name, and use "scheduleReal" as the prediction type
     	 */
     	if(Manager.isHybridAgency()) {
+    		Log.v(activityNameTag, "Is a hybrid!!!");
+    		
     		rq = "http://feed.busbrothers.org/ClosestStops/XMLRouteList.jsp?" +
 			"&agencyName="+URLEncoder.encode(a.name) +
 			"&predictionType="+ URLEncoder.encode("scheduleReal") +
