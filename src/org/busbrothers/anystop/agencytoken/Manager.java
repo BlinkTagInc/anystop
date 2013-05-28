@@ -393,8 +393,11 @@ public class Manager {
 					if(Utils.routeStripTrailing(s.routeName).equals(Utils.routeStripTrailing(currStop.routeName))) {
 						foundDuplicateRouteName = true;
 						
-						//If the currently stored SimpleStop is real-time, keep it & don't add a new simple stop
-						if(currStop.isRTstr.equals("real"));
+						//If the currently stored SimpleStop is real-time, keep it & add the additional simplestop (if headsigns not idential)
+						if(currStop.isRTstr.equals("real")) {
+							if(! currStop.headSign.equals(s.headSign))
+								stopMap.get(intersection).add(s);
+						}
 						//If the currenly stored SimpleStop is NOT real time, replace it
 						else if(!currStop.isRTstr.equals("real")) {
 							Log.v(activityNameTag,"Replacing stored stop with route " + currStop.routeName + 
@@ -576,6 +579,11 @@ public class Manager {
 	}
 	
 	public static boolean isWMATA() {
+		if(Manager.getAgencyTag() == null) {
+			Log.e(activityNameTag, "isWMATA got impossible null");
+			return false;
+		}
+	
 		return Manager.getAgencyTag().equals("wmatawashington");
 	}
 	

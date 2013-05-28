@@ -33,6 +33,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -647,9 +649,36 @@ public class ChooseMap extends MapActivity {
 	    			lochandler.sendEmptyMessage(4);
 	    		}
 	    	} else {
-		    	String encoded = URLEncoder.encode(string);
+	    		Geocoder geocoder = new Geocoder(me);
+	    		List<Address> matches = null;
+	    		
+	    		try {
+	    			matches = geocoder.getFromLocationName(string, 5);
+	    		} catch (IOException e) {
+	    			Log.w(activityNameTag, "Geolocation resulted in error " + e.toString());
+	    		}
+	    		
+	    		if(matches == null || matches.size() < 1) {
+	    			g=null;
+	    			lochandler.sendEmptyMessage(6);
+	    		} else {
+		    		int lat = (int) (matches.get(0).getLatitude()*1000000);
+					int lon = (int) (matches.get(0).getLongitude()*1000000);
+					if (lat==0 || lon==0) {
+						lochandler.sendEmptyMessage(6);
+						g=null;
+					} else {
+						g = new GeoPoint(lat,lon);
+						
+					}
+	    		}
+	    		
+	    		/*String encoded = URLEncoder.encode(string);
 		    	String url = "http://maps.google.com/maps/geo?q=" + 
-		    		encoded + "&output=csv&oe=utf8&sensor=false&key=" + R.string.maps_apik;
+		    		encoded + "&output=csv&oe=utf8&sensor=false&key=" + getString(R.string.maps_apik);
+		    	
+		    	Log.i(activityNameTag, "Geocoding with URL=" + url);
+		    	
 		    	String s;
 		    	InputStream is;
 		    	DataInputStream dis;
@@ -684,6 +713,7 @@ public class ChooseMap extends MapActivity {
 					g = new GeoPoint(lat,lon);
 					
 				}
+				*/
 	    	}
 			
 			//Don't need to dismiss locd if userManagerLocation because that means we didn't create a locd to begin with :)
@@ -696,6 +726,7 @@ public class ChooseMap extends MapActivity {
 			
 			Log.v(activityNameTag, "Decided that your location was (" + g.getLatitudeE6() + ", " + g.getLongitudeE6() + ")");
 			
+			//Draw the new user's selected location on the mpa using mapOverlay
 			mapOverlays.remove(startOverlay);
 	        startOverlay = new ChooseMapItemizedOverlay(start);
 	        startpoint = g;

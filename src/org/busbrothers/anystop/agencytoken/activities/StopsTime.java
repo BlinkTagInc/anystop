@@ -326,27 +326,6 @@ public class StopsTime extends Activity{
 	
 	protected void onStart() {
 		super.onStart();
-		
-		if (Manager.isUseUsage(this) && first) {
-			//Below two lines commented out per to-do 55622789
-//			Toast t = Toast.makeText(this, "Welcome to " + getString(R.string.app_name) + "!", Toast.LENGTH_LONG);
-//			t.show();
-			
-//			t = Toast.makeText(this, "You can look at routes and stops near a selected location.", Toast.LENGTH_SHORT);
-//			t.show();
-//			
-//			t = Toast.makeText(this, "You can view all available agencies using the \"All Agencies\" button.", Toast.LENGTH_LONG);
-//			t.show();
-//			
-//			t = Toast.makeText(this, "You can view nearby agencies using the \"Nearby Agencies\" button.", Toast.LENGTH_LONG);
-//			t.show();
-//			
-//			t = Toast.makeText(this, "Or, you can access your favorites!", Toast.LENGTH_SHORT);
-//			t.show();
-			
-			
-			first=false;
-		}
         
         //Report memory usage
         //Manager.printMemoryUsageInfo();

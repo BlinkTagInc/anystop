@@ -65,14 +65,14 @@
     <string name="agencyScheduleTable">na</string>
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
     
-    <string name="agencyName">WMATA_Washington</string>
+    <!-- <string name="agencyName">WMATA_Washington</string>
     <string name="agencyTable">WMATA_Washington</string>
     <string name="agencyPredictionType">real</string>
     <string name="agencyTag">wmatawashington</string>
     <string name="agencyLong">WMATA Washington</string>
     <string name="agencyShort">DC WMATA</string>
     <string name="agencyScheduleTable">na</string>
-    <string name="agencyIsHybrid">isNotAHybridAgency</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
       
     <!-- <string name="agencyName">pace-suburban-bus-service</string>
     <string name="agencyTable">pace_suburban_bus_service</string>
@@ -196,6 +196,51 @@
     <string name="agencyShort">Fairfax CUE</string>
     <string name="agencyScheduleTable">na</string>
     <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">San_Francisco_Muni</string>
+    <string name="agencyTable">San_Francisco_Muni</string>
+    <string name="agencyPredictionType">real</string>
+    <string name="agencyTag">sanfranciscomuni</string>
+    <string name="agencyLong">San Francisco Muni</string>
+    <string name="agencyShort">MUNI</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">adelaide_metro</string>
+    <string name="agencyTable">adelaide_metro</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">adelaide_metro</string>
+    <string name="agencyLong">Aidelaide Metro</string>
+    <string name="agencyShort">Aidelaide Metro</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">action</string>
+    <string name="agencyTable">action</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">action</string>
+    <string name="agencyLong">Canberra</string>
+    <string name="agencyShort">Canberra</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <!-- <string name="agencyName">metropolitan_atlanta_rapid_transit_authority</string>
+    <string name="agencyTable">metropolitan_atlanta_rapid_transit_authority</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">metropolitan_atlanta_rapid_transit_authority</string>
+    <string name="agencyLong">Marin</string>
+    <string name="agencyShort">Marin</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string> -->
+    
+    <string name="agencyName">spokane_transit_authority</string>
+    <string name="agencyTable">spokane_transit_authority</string>
+    <string name="agencyPredictionType">schedule</string>
+    <string name="agencyTag">spokane_transit_authority</string>
+    <string name="agencyLong">Marin</string>
+    <string name="agencyShort">Marin</string>
+    <string name="agencyScheduleTable">na</string>
+    <string name="agencyIsHybrid">isNotAHybridAgency</string>
     
     <!-- The below strings are used by ChooseMap to set up the MapView, to point to the right area -->
     <!-- <string name="agencyLat">37336000</string>

@@ -104,6 +104,9 @@ public class StopDrill extends CustomList {
 			Iterator <SimpleStop> tempArrIterator = tempArr.iterator();
 			while(tempArrIterator.hasNext()){
 				SimpleStop currStop = tempArrIterator.next();
+				
+				Log.i(activityNameTag, "Added stop intersection=" + currStop.intersection + ", headsign=" + currStop.headSign);
+				
 				arr.add(currStop);
 				
 				//Case - we have already seen this head sign (direction)
@@ -334,6 +337,7 @@ public class StopDrill extends CustomList {
 						deltaTime.setText(predictionTime[0]);
 						
 						//Hax for TheBUS since TheBUS sometimes has real-time predictions for the next arrival
+						//this lets us set the color of the real-time predictions for thebus to something else
 						if(stop.pred.isRT && Manager.getAgencyTag().equals("thebus") && first_string) {
 							absTime.setText(predictionTime[1] + " (real-time)");
 							absTime.setTextColor(0xFF009900);

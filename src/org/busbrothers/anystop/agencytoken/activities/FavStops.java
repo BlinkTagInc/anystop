@@ -53,9 +53,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 public class FavStops extends CustomList {
 
 	FavStops me;
-	/*public static FavStops single() {
-		return me;
-	}*/
 	
 	ProgressDialog pd;
 	
@@ -333,7 +330,6 @@ public class FavStops extends CustomList {
 			}
 			else {
 				try {
-					Log.d("FavStops", "Getting array position " + Manager.positionTracker + " from array of length " + arr.size());
 					if(Manager.isWMATA()) WMATATransitDataManager.fetchPredictionsByStop(arr.get(Manager.positionTracker));
 					else Manager.loadStop(arr.get(Manager.positionTracker));
 				} catch (NoneFoundException e) {
@@ -341,9 +337,6 @@ public class FavStops extends CustomList {
 				} catch (ServerBarfException e) {
 					errorHandler.sendEmptyMessage(1); return;
 				}
-				
-				//Ivany: Added for testing only, please remove asap!!!
-				//errorHandler.sendEmptyMessage(0); return;
 				
 				pd.dismiss();
 				stact.sendEmptyMessage(0);
